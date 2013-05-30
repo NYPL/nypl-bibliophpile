@@ -1,0 +1,18 @@
+{
+    "name": "nypl/bibliocommons-api",
+    "autoload": {
+        "psr-0": {"NYPL": "src/"}
+    },
+    "repositories": [
+        {
+            "type": "pear",
+            "url": "http://pear.php.net"
+        }
+    ],
+    "require": {
+        "pear-pear/HTTP_Request2": "~2.1.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    }
+}
