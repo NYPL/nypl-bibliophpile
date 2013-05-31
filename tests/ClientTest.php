@@ -57,6 +57,9 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $conn_stub->expects($this->any())
       ->method('getUrl')
       ->will($this->returnValue($url_stub));
+    $url_stub->expects($this->any())
+      ->method('setQueryVariables')
+      ->with($this->arrayHasKey('api_key'));
     $response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue(self::NYPL_RESP));
