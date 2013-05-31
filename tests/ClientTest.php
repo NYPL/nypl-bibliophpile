@@ -1,20 +1,11 @@
 <?php
 
 require 'vendor/autoload.php';
-
+include_once('response_helpers.inc');
 
 
 class ClientTest extends PHPUnit_Framework_TestCase
 {
-  const NYPL_RESP = '
-  {
-      "library": {
-          "catalog_url": "http://nypl.bibliocommons.com",
-          "id": "nypl",
-          "name": "New York Public Library"
-      }
-  }';
-
   protected $conn_stub;
   protected $response_stub;
 
@@ -58,6 +49,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
   }
 
   public function testClientRetrievesAnEndpoint() {
+    global $LIBRARY_RESPONSE;
     $this->conn_stub->expects($this->any())
       ->method('setUrl')
       ->with($this->equalTo('https://api.bibliocommons.com/v1/libraries/nypl'));
@@ -66,13 +58,22 @@ class ClientTest extends PHPUnit_Framework_TestCase
       ->with($this->arrayHasKey('api_key'));
     $this->response_stub->expects($this->any())
       ->method('getBody')
-      ->will($this->returnValue(self::NYPL_RESP));
+      ->will($this->returnValue($LIBRARY_RESPONSE));
 
     $client = new NYPL\BiblioCommons\Api\Client('abcdef', $this->conn_stub);
 
     $this->assertEquals(
       'New York Public Library', 
       $client->getEndpoint('libraries/nypl')->library->name);
+  }
+
+  /**
+   * @expectedException JsonException
+   */
+  public function testRaisesExceptionForBadJson() {
+    $conn_stub = $this->getMock('HTTP_Request2');
+    $client = new NYPL\BiblioCommons\Api\Client('abcdef', $this->conn_stub);
+    $client->getEndpoint('libraries/nypl');
   }
 
   public function testRetrievesLibraryById() {
