@@ -53,6 +53,7 @@ class Client {
   }
 
   public function library($id) {
-    
+    $path = 'libraries/' . $id;
+    return new Library($this->getEndPoint($path)->library, $this);
   }
 }

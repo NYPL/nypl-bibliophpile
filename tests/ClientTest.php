@@ -54,9 +54,6 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $this->conn_stub->expects($this->any())
       ->method('setUrl')
       ->with($this->equalTo('https://api.bibliocommons.com/v1/libraries/nypl'));
-    $this->url_stub->expects($this->any())
-      ->method('setQueryVariables')
-      ->with($this->arrayHasKey('api_key'));
     $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_library_response));
@@ -78,9 +75,27 @@ class ClientTest extends PHPUnit_Framework_TestCase
   }
 
   public function testRetrievesLibraryById() {
-    $conn_stub = $this->getMock('HTTP_Request2');
-    $client = new NYPL\BiblioCommons\Api\Client('abcdef', $this->conn_stub);
-    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Library', $client->library('nypl'));
+    // $conn_stub = $this->getMock('HTTP_Request2');
+
+    global $_library_response;
+    $this->conn_stub->expects($this->any())
+      ->method('setUrl')
+      ->with($this->equalTo('https://api.bibliocommons.com/v1/libraries/nypl'));
+    $this->url_stub->expects($this->any())
+      ->method('setQueryVariables')
+      ->with($this->arrayHasKey('api_key'));
+    $this->response_stub->expects($this->any())
+      ->method('getBody')
+      ->will($this->returnValue($_library_response));
+
+    $client = new \NYPL\BiblioCommons\Api\Client('abcdef', $this->conn_stub);
+    $library = $client->library('nypl');
+
+    # It should be a Library
+    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Library', $library);
+
+    # It should have the right name
+    $this->assertEquals('New York Public Library', $library->name());
   }
 }
 
