@@ -8,6 +8,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
 {
   protected $conn_stub;
   protected $response_stub;
+  protected $url_stub;
 
   protected function setUp() {
     $this->conn_stub = $this->getMock('HTTP_Request2');
@@ -49,7 +50,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
   }
 
   public function testClientRetrievesAnEndpoint() {
-    global $LIBRARY_RESPONSE;
+    global $_library_response;
     $this->conn_stub->expects($this->any())
       ->method('setUrl')
       ->with($this->equalTo('https://api.bibliocommons.com/v1/libraries/nypl'));
@@ -58,7 +59,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
       ->with($this->arrayHasKey('api_key'));
     $this->response_stub->expects($this->any())
       ->method('getBody')
-      ->will($this->returnValue($LIBRARY_RESPONSE));
+      ->will($this->returnValue($_library_response));
 
     $client = new NYPL\BiblioCommons\Api\Client('abcdef', $this->conn_stub);
 
