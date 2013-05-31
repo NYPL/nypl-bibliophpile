@@ -16,7 +16,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
   }';
 
 
-  public function testMinimalConstructor() {
+  public function testMinimalConstructorWorks() {
     $client = new NYPL\BiblioCommons\Api\Client('abcdef');
 
     # It saved the key we passed
@@ -26,7 +26,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $this->assertInstanceOf('HTTP_Request2', $client->conn());
   }
 
-  public function testOptionalConstructor() {
+  public function testOptionalConstructorWorks() {
     $conn = new \HTTP_Request2();
 
     $client = new NYPL\BiblioCommons\Api\Client('abcdef', $conn);
@@ -38,7 +38,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $this->assertSame($conn, $client->conn());
   }
 
-  public function testGettingEndpoint() {
+  public function testClientRetrievesAnEndpoint() {
     $conn_stub = $this->getMock('HTTP_Request2');
     $response_stub = $this->getMockBuilder('HTTP_Request2_Response')
       ->disableOriginalConstructor()
