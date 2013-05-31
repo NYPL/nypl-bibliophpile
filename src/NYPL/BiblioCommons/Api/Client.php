@@ -51,4 +51,8 @@ class Client {
     return json_decode($data);
 
   }
+
+  public function library($id) {
+    
+  }
 }
