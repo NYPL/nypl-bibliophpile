@@ -89,4 +89,22 @@ class Client {
     $path = 'libraries/' . $id;
     return new Library($this->getEndPoint($path)->library, $this);
   }
+
+  /**
+   * Get the locations for a library.
+   *
+   * @param string $id
+   *   The library's id (e.g. 'nypl')
+   *
+   * @return array
+   *   Array of Location objects
+   */
+  public function locations($id) {
+    $path = 'libraries/' . $id . '/locations';
+    $locations = array();
+    foreach ($this->getEndPoint($path)->locations as $l) {
+      $locations[] = new Location($l);
+    }
+    return $locations;
+  }
 }

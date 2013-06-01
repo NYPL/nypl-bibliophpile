@@ -97,5 +97,27 @@ class ClientTest extends PHPUnit_Framework_TestCase
     # It should have the right name
     $this->assertEquals('New York Public Library', $library->name());
   }
+
+  public function testRetrievesLibraryLocations() {
+    global $_locations_response;
+    $this->conn_stub->expects($this->any())
+      ->method('setUrl')
+      ->with($this->equalTo('https://api.bibliocommons.com/v1/libraries/nypl/locations'));
+    $this->response_stub->expects($this->any())
+      ->method('getBody')
+      ->will($this->returnValue($_locations_response));
+
+    $client = new \NYPL\BiblioCommons\Api\Client('abcdef', $this->conn_stub);
+    $locations = $client->locations('nypl');
+
+    // It should return an array
+    $this->assertInternalType('array', $locations);
+
+    // It should be an array of Location objects
+    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Location', $locations[0]);
+
+    // It should be an array of the right Location objects
+    $this->assertEquals('115th Street', $locations[0]->name());
+  }
 }
 
