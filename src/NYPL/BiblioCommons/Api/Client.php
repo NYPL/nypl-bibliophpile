@@ -2,17 +2,45 @@
 
 /**
  * @file
- * Client class 
+ * Client class
  */
 
 namespace NYPL\BiblioCommons\Api;
 
+/**
+ * Client provides for all the communication between the BiblioCommons API and
+ * other classes in this library. Objects returned by methods of this class
+ * hold their own references to the Client through which they were retrieved,
+ * so all communication is made through a single instance of this class.
+ */
 class Client {
 
+  /**
+   * Base for all BiblioCommons API URLs.
+   *
+   * @var string
+   */
   const API_BASE = 'https://api.bibliocommons.com';
+
+  /**
+   * Version of the BiblioCommons API used by this library
+   *
+   * @var string
+   */
   const API_VERSION = 'v1';
 
+  /**
+   * The user's api key, supplied by BiblioCommons.
+   *
+   * @var string
+   */
   protected $apikey = NULL;
+
+  /**
+   * HTTP client used by the Client
+   *
+   * @var \HTTP_Request2
+   */
   protected $conn = NULL;
 
   /**
@@ -20,6 +48,10 @@ class Client {
    *
    * @param string $key 
    *   Your API key
+   * @param \HTTP_Request2 $conn 
+   *   An \HTTP_Request2 object. If not supplied, the Client will create its
+   *   own. A use for this parameter might be to supply the Client with a 
+   *   an object of a custom class derived from HTTP_Request2
    */
   public function __construct($key, $conn = NULL) {
     $this->apikey = $key;
