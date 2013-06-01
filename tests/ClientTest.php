@@ -53,7 +53,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
     global $_library_response;
     $this->conn_stub->expects($this->any())
       ->method('setUrl')
-      ->with($this->equalTo('https://api.bibliocommons.com/v1/libraries/nypl'));
+      ->with($this->equalTo('https://api.bibliocommons.com/v1/test/url'));
     $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_library_response));
@@ -62,7 +62,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
 
     $this->assertEquals(
       'New York Public Library', 
-      $client->getEndpoint('libraries/nypl')->library->name);
+      $client->getEndpoint('test/url')->library->name);
   }
 
   /**
