@@ -120,7 +120,6 @@ $_lists_response = <<<'JSON'
 }
 JSON;
 
-
 // https://api.bibliocommons.com/v1/titles/18708779052907?api_key=...
 $_title_response = <<<'JSON'
 {
@@ -184,5 +183,37 @@ $_title_response = <<<'JSON'
         "suitabilities": [],
         "title": "Moby-Dick"
     }
+}
+JSON;
+
+// Short version of previous response returned as part of the list of titles by
+// https://api.bibliocommons.com/v1/titles?api_key=...&q=Moby+Dick&library=nypl
+$_title_short_response = <<<'JSON'
+{
+    "authors": [
+        {
+            "name": "Melville, Herman"
+        }
+    ],
+    "availability": {
+        "id": "AVAILABLE",
+        "name": "Available to borrow"
+    },
+    "details_url": "http://nypl.bibliocommons.com/item/show/18708779052907",
+    "format": {
+        "id": "PAPERBACK",
+        "name": "Paperback"
+    },
+    "id": "18708779052907",
+    "isbns": [
+        "0553213113",
+        "9780553213119"
+    ],
+    "primary_language": {
+        "name": "English"
+    },
+    "publication_date": "2003",
+    "sub_title": "",
+    "title": "Moby-Dick"
 }
 JSON;
