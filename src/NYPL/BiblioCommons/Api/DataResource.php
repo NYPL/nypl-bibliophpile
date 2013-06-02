@@ -9,6 +9,11 @@ namespace NYPL\BiblioCommons\Api;
 
 class DataResource {
 
+  /**
+   * The parsed JSON data.
+   *
+   * @var StdObj
+   */
   protected $data;
 
   /**
