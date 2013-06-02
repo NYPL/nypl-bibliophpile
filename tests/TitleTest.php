@@ -13,6 +13,7 @@ class TitleTest extends PHPUnit_Framework_TestCase {
   protected $responseStub;
   protected $client;
   protected $title;
+  protected $shortTitle;
 
   /**
    * Set up tests.
@@ -20,6 +21,7 @@ class TitleTest extends PHPUnit_Framework_TestCase {
   protected function setUp() {
 
     global $_title_response;
+    global $_title_short_response;
 
     $this->connStub = $this->getMock('HTTP_Request2');
     $this->client
@@ -27,12 +29,25 @@ class TitleTest extends PHPUnit_Framework_TestCase {
     $this->title = new NYPL\BiblioCommons\Api\Title(
       json_decode($_title_response)->title,
       $this->client);
+
+    // When returned as part of a list of titles, many fields are left out of
+    // the response.
+    $this->shortTitle = new NYPL\BiblioCommons\Api\Title(
+      json_decode($_title_short_response),
+      $this->client);
   }
 
   /**
    * Make sure we can we build a title from JSON.
    */
-  public function testConstructorWorks() {
+  public function testConstructorWorksForShortObject() {
+    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Title', $this->shortTitle);
+  }
+
+  /**
+   * Make sure we can we build a title from JSON.
+   */
+  public function testConstructorWorksForFullObject() {
     $this->assertInstanceOf('NYPL\BiblioCommons\Api\Title', $this->title);
   }
 
