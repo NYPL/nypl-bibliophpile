@@ -7,7 +7,25 @@
 
 namespace NYPL\BiblioCommons\Api;
 
-class Location extends DataResource {
+class Series extends DataResource {
+
+  /**
+   * Series object constructor.
+   *
+   * @param StdObj $data 
+   *   Parsed JSON for the object.
+   */
+  public function __construct($data) {
+    parent::__construct($data);
+    $this->initOptionalProperties();
+  }
+
+  /**
+   * Initialize optional properties.
+   */
+  protected function initOptionalProperties() {
+    $this->initOptionalProperty('number', 'string');
+  }
 
   /**
    * Returns the series' name.
