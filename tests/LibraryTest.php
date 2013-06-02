@@ -53,7 +53,7 @@ class LibraryTest extends PHPUnit_Framework_TestCase {
   /**
    * Every Library has a link to its catalog.
    */
-  public function testCatalogUrl() {
+  public function testHasCatalogUrl() {
     $this->assertEquals(
       'http://nypl.bibliocommons.com',
       $this->library->catalog()
@@ -61,7 +61,7 @@ class LibraryTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * A Library can return it's Locations
+   * A Library can return it's Locations.
    */
   public function testReturnsLocations() {
     global $_locations_response;
@@ -74,7 +74,6 @@ class LibraryTest extends PHPUnit_Framework_TestCase {
     $this->url_stub = $this->getMockBuilder('Net_URL2')
       ->disableOriginalConstructor()
       ->getMock();
-
 
     $this->responseStub->expects($this->any())
       ->method('getBody')
@@ -89,13 +88,13 @@ class LibraryTest extends PHPUnit_Framework_TestCase {
 
     $locations = $this->library->locations();
 
-    // It should return an array
+    // It should return an array.
     $this->assertInternalType('array', $locations);
 
-    // It should be an array of Location objects
+    // It should be an array of Location objects.
     $this->assertInstanceOf('NYPL\BiblioCommons\Api\Location', $locations[0]);
 
-    // It should be an array of the right Location objects
+    // It should be an array of the right Location objects.
     $this->assertEquals('115th Street', $locations[0]->name());
   }
 }
