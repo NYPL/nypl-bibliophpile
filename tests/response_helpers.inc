@@ -217,3 +217,17 @@ $_title_short_response = <<<'JSON'
     "title": "Moby-Dick"
 }
 JSON;
+
+$_series_response_number = <<<'JSON'
+{
+    "name": "Series Title",
+    "number": "1"
+}
+JSON;
+
+$_series_response_no_number = <<<'JSON'
+{
+    "name": "Numberless Series Title",
+    "number": ""
+}
+JSON;
