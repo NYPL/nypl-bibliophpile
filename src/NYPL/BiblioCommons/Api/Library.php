@@ -54,4 +54,14 @@ class Library {
   public function catalog() {
     return $this->data->catalog_url;
   }
+
+  /**
+   * Fetch the library's locations.
+   *
+   * @return array
+   *   List of Location objects
+   */
+  public function locations() {
+    return $this->client->locations($this->id());
+  }
 }

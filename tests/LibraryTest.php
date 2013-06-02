@@ -10,6 +10,7 @@ include_once 'response_helpers.inc';
 class LibraryTest extends PHPUnit_Framework_TestCase {
 
   protected $connStub;
+  protected $responseStub;
   protected $client;
   protected $library;
 
@@ -57,5 +58,44 @@ class LibraryTest extends PHPUnit_Framework_TestCase {
       'http://nypl.bibliocommons.com',
       $this->library->catalog()
     );
+  }
+
+  /**
+   * A Library can return it's Locations
+   */
+  public function testReturnsLocations() {
+    global $_locations_response;
+    $this->connStub->expects($this->any())
+      ->method('setUrl')
+      ->with($this->equalTo('https://api.bibliocommons.com/v1/libraries/nypl/locations'));
+    $this->responseStub = $this->getMockBuilder('HTTP_Request2_Response')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->url_stub = $this->getMockBuilder('Net_URL2')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+
+    $this->responseStub->expects($this->any())
+      ->method('getBody')
+      ->will($this->returnValue($_locations_response));
+
+    $this->connStub->expects($this->any())
+      ->method('send')
+      ->will($this->returnValue($this->responseStub));
+    $this->connStub->expects($this->any())
+      ->method('getUrl')
+      ->will($this->returnValue($this->url_stub));
+
+    $locations = $this->library->locations();
+
+    // It should return an array
+    $this->assertInternalType('array', $locations);
+
+    // It should be an array of Location objects
+    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Location', $locations[0]);
+
+    // It should be an array of the right Location objects
+    $this->assertEquals('115th Street', $locations[0]->name());
   }
 }
