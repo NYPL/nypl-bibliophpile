@@ -7,23 +7,7 @@
 
 namespace NYPL\BiblioCommons\Api;
 
-class Library {
-
-  protected $data;
-  protected $client;
-
-  /**
-   * Library object constructor.
-   *
-   * @param StdObj $data 
-   *   Parsed JSON for the object.
-   * @param Client $client
-   *   Client for future connections
-   */
-  public function __construct($data, $client) {
-    $this->data = $data;
-    $this->client = $client;
-  }
+class Library extends ClientResource {
 
   /**
    * Fetch the library's name.
