@@ -11,15 +11,7 @@ namespace NYPL\BiblioCommons\Api;
  * ClientResource is the base class for all resources that have a reference to
  * to the master client and can therefor make additional API requests
  */
-class ClientResource {
-
-
-  /**
-   * The parsed JSON data.
-   *
-   * @var StdObj
-   */
-  protected $data;
+class ClientResource extends DataResource {
 
   /**
    * The client.
@@ -37,7 +29,7 @@ class ClientResource {
    *   Client for future connections
    */
   public function __construct($data, $client) {
-    $this->data = $data;
+    parent::__construct($data);
     $this->client = $client;
   }
 
