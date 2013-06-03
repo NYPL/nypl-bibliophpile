@@ -66,10 +66,16 @@ class ClientTest extends PHPUnit_Framework_TestCase
   }
 
   /**
-   * @expectedException JsonException
+   * @expectedException \NYPL\BiblioCommons\Api\JsonException
    */
   public function testRaisesExceptionForBadJson() {
-    $conn_stub = $this->getMock('HTTP_Request2');
+    // $conn_stub = $this->getMock('HTTP_Request2');
+    global $_bad_json;
+    $this->conn_stub->expects($this->any())
+      ->method('setUrl');
+    $this->response_stub->expects($this->any())
+      ->method('getBody')
+      ->will($this->returnValue($_bad_json));
     $client = new NYPL\BiblioCommons\Api\Client('abcdef', $this->conn_stub);
     $client->getEndpoint('libraries/nypl');
   }

@@ -94,6 +94,9 @@ class Client {
    *
    * @return StdObj
    *   The parsed JSON
+   *
+   * @throws NYPL\BiblioCommons\Api\JsonException 
+   *   When the JSON response cannot be parsed
    */
   public function getEndpoint($path, $params = array()) {
     $all_params = array_merge($params, array('api_key' => 'few2vjhmdnhjhw7xnajj9wxt'));
@@ -104,8 +107,13 @@ class Client {
     $this->conn->setUrl($url);
     $this->conn->getUrl()->setQueryVariables($all_params);
     $data = $this->conn->send()->getBody();
-    return json_decode($data);
+    $parsed = json_decode($data);
 
+    if ($parsed !== NULL) {
+      return $parsed;
+    }
+
+    throw new JsonException('Error parsing JSON');
   }
 
   /**

@@ -231,3 +231,6 @@ $_series_response_no_number = <<<'JSON'
     "number": ""
 }
 JSON;
+
+$_bad_json = "This isn't JSON";
+
