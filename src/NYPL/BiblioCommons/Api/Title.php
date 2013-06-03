@@ -22,7 +22,7 @@ class Title extends ClientResource {
    */
   public function __construct($data, $client) {
     parent::__construct($data, $client);
-    $this->format = new Format($this->data->format);
+    $this->data->format = new Format($this->data->format);
     $this->initOptionalProperties();
   }
 
@@ -52,7 +52,7 @@ class Title extends ClientResource {
     $this->initOptionalProperty('physical_description', 'array', array());
 
     if ($this->data->availability !== NULL) {
-      $this->availability = new Availability($this->data->availability);
+      $this->data->availability = new Availability($this->data->availability);
     }
   }
 
@@ -96,7 +96,7 @@ class Title extends ClientResource {
    *   The format
    */
   public function format() {
-    return $this->format;
+    return $this->data->format;
   }
 
   /**
@@ -106,6 +106,6 @@ class Title extends ClientResource {
    *   The availability
    */
   public function availability() {
-    return $this->availability;
+    return $this->data->availability;
   }
 }
