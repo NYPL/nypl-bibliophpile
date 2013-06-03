@@ -101,4 +101,54 @@ class DataResource {
       throw new \Exception('WRONG TYPE (' . $class . ') for ' . $value . '(' . gettype($this->data->$value) . ')');
     }
   }
+
+  /**
+   * Flattens lists of single-property items.
+   *
+   * The BiblioCommons API returns many properties, the 'authors' property of
+   * Title objects, for instance, as lists of objects with a single property 
+   * (usually) name. Take a list of single-property objects and return a list
+   * of only the values of the single properties. E.g.:
+   *
+   * "authors": [
+   *   {
+   *     "name": "First Author"  
+   *   },
+   *   {
+   *     "name": "Second Author"  
+   *   }
+   * ]
+   *
+   * becomes:
+   *
+   * ["First Author", "Second Author"]
+   *
+   * @param array $list
+   *   The list to flatten
+   * @param string $prop
+   *   The property to pick out of the object
+   *
+   * @return array
+   *   The flattened list of properties
+   * @throws \NYPL\BiblioCommons\API\PropertyNotFoundException
+   *   When the given property does not exist in the object 
+   */
+  protected function flattenSingleProperties($list, $prop = 'name') {
+    // NULL lists should stay NULL. Avoid error. Do nothing.
+    if ($list === NULL) {
+      return;
+    }
+
+    $flattened = array();
+
+    foreach ($list as $item) {
+      if (!property_exists($item, $prop)) {
+        throw new PropertyNotFoundException("Flattening object but it does "
+          . "not have a \"" . $prop . "\" property.");
+      }
+
+      $flattened[] = $item->$prop;
+    }
+    return $flattened;
+  }
 }

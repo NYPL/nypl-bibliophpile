@@ -54,6 +54,19 @@ class Title extends ClientResource {
     if ($this->data->availability !== NULL) {
       $this->data->availability = new Availability($this->data->availability);
     }
+
+    $this->data->authors
+      = $this->flattenSingleProperties($this->data->authors);
+    $this->data->additional_contributors
+      = $this->flattenSingleProperties($this->data->additional_contributors);
+    $this->data->publishers
+      = $this->flattenSingleProperties($this->data->publishers);
+    $this->data->languages
+      = $this->flattenSingleProperties($this->data->languages);
+    $this->data->performers
+      = $this->flattenSingleProperties($this->data->performers);
+    $this->data->suitabilities
+      = $this->flattenSingleProperties($this->data->suitabilities);
   }
 
   /**
@@ -107,5 +120,65 @@ class Title extends ClientResource {
    */
   public function availability() {
     return $this->data->availability;
+  }
+
+  /**
+   * Returns the title's authors.
+   *
+   * @return array
+   *   The authors
+   */
+  public function authors() {
+    return $this->data->authors;
+  }
+
+  /**
+   * Returns the title's additional contributors.
+   *
+   * @return array
+   *   The additional contributors
+   */
+  public function additionalContributors() {
+    return $this->data->additional_contributors;
+  }
+
+  /**
+   * Returns the title's publishers.
+   *
+   * @return array
+   *   The publishers
+   */
+  public function publishers() {
+    return $this->data->publishers;
+  }
+
+  /**
+   * Returns the title's languages.
+   *
+   * @return array
+   *   The languages
+   */
+  public function languages() {
+    return $this->data->languages;
+  }
+
+  /**
+   * Returns the title's performers.
+   *
+   * @return array
+   *   The performers
+   */
+  public function performers() {
+    return $this->data->performers;
+  }
+
+  /**
+   * Returns the title's suitabilities.
+   *
+   * @return array
+   *   The suitabilities
+   */
+  public function suitabilities() {
+    return $this->data->suitabilities;
   }
 }

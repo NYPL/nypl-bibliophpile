@@ -120,7 +120,7 @@ $_lists_response = <<<'JSON'
 }
 JSON;
 
-// https://api.bibliocommons.com/v1/titles/18708779052907?api_key=...
+// Based on https://api.bibliocommons.com/v1/titles/18708779052907?api_key=...
 $_title_response = <<<'JSON'
 {
     "title": {
@@ -164,7 +164,14 @@ $_title_response = <<<'JSON'
             "Includes bibliographical references (p. [668]-670)"
         ],
         "pages": 670,
-        "performers": [],
+        "performers": [
+            {
+                "name": "Performer One"
+            },
+            {
+                "name": "Performer Two"
+            }
+        ],
         "physical_description": [
             "xxvii, 670 p. ;,18 cm."
         ],
@@ -180,7 +187,15 @@ $_title_response = <<<'JSON'
         "series": [],
         "statement_of_responsibility": "Herman Melville ; edited and with an introduction by Charles Child Walcutt",
         "sub_title": "",
-        "suitabilities": [],
+        "suitabilities": [
+            {
+                "name": "First Suitability"
+            },
+            {
+                "name": "Second Suitability"
+
+            }
+        ],
         "title": "Moby-Dick"
     }
 }

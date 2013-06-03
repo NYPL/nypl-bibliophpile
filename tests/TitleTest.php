@@ -100,4 +100,95 @@ class TitleTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals('Available', $this->title->availability()->name());
     $this->assertEquals('AVAILABLE', $this->title->availability()->id());
   }
+
+  /**
+   * authors() should return a list
+   */
+  public function testAuthorsReturnsArray() {
+    $this->assertInternalType('array', $this->title->authors());
+  }
+
+  /**
+   * additional_contributors() should return a list
+   */
+  public function testAdditionalContributorsReturnsArray() {
+    $this->assertInternalType('array', $this->title->additionalContributors());
+  }
+
+  /**
+   * publishers() should return a list
+   */
+  public function testPublishersReturnsArray() {
+    $this->assertInternalType('array', $this->title->publishers());
+  }
+
+  /**
+   * languages() should return a list
+   */
+  public function testLanguagesReturnsArray() {
+    $this->assertInternalType('array', $this->title->languages());
+  }
+
+  /**
+   * performers() should return a list
+   */
+  public function testPerformersReturnsArray() {
+    $this->assertInternalType('array', $this->title->performers());
+  }
+
+  /**
+   * suitabilities() should return a list
+   */
+  public function testSuitabilitiesReturnsArray() {
+    $this->assertInternalType('array', $this->title->suitabilities());
+  }
+
+  /**
+   * Lists of "single-property" objects should be flattened into lists of the
+   * values of the single properties.
+   */
+  public function testListOfAuthorsIsFlattened() {
+    $list = $this->title->authors();
+    $this->assertInternalType('string', $list[0]);
+  }
+
+  /**
+   * additional_contributors() should return a flattened list
+   */
+  public function testListOfAdditionalContributorsIsFlattened() {
+    $list = $this->title->additionalContributors();
+    $this->assertInternalType('string', $list[0]);
+  }
+
+  /**
+   * publishers() should return a flattened list
+   */
+  public function testListOfPublishersIsFlattened() {
+    $list = $this->title->publishers();
+    $this->assertInternalType('string', $list[0]);
+  }
+
+  /**
+   * languages() should return a flattened list
+   */
+  public function testListOfLanguagesIsFlattened() {
+    $list = $this->title->languages();
+    $this->assertInternalType('string', $list[0]);
+  }
+
+  /**
+   * performers() should return a flattened list
+   */
+  public function testListOfPerformersIsFlattened() {
+    $list = $this->title->performers();
+    $this->assertInternalType('string', $list[0]);
+  }
+
+  /**
+   * suitabilities() should return a flattened list
+   */
+  public function testListOfSuitabilitiesIsFlattened() {
+    $list = $this->title->suitabilities();
+    $this->assertInternalType('string', $list[0]);
+  }
 }
