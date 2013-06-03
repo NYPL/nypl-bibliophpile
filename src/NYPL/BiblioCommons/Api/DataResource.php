@@ -54,6 +54,7 @@ class DataResource {
   protected function initOptionalProperty($value, $class, $null_value = NULL) {
     if (!property_exists($this->data, $value)) {
       $this->data->$value = $null_value;
+      return;
     }
 
     if (gettype($this->data->$value) === $class) {
@@ -61,6 +62,34 @@ class DataResource {
         if (($this->data->$value === '') or ($this->data->$value === NULL)) {
           $this->data->$value = $null_value;
         }
+
+        // Leave value as is.
+        return;
+      }
+
+      if ($class == 'array') {
+        if ((count($this->data->$value) === 0) or ($this->data->$value === NULL)) {
+          $this->data->$value = $null_value;
+        }
+
+        // Leave value as is.
+        return;
+      }
+
+      if ($class == 'object') {
+        if ($this->data->$value === NULL) {
+          $this->data->$value = $null_value;
+        }
+
+        // Leave value as is.
+        return;
+      }
+
+      if ($class == 'integer') {
+        if ($this->data->$value === NULL) {
+          $this->data->$value = $null_value;
+        }
+
         // Leave value as is.
         return;
       }
@@ -69,7 +98,7 @@ class DataResource {
         gettype($this->data->$value));
     }
     else {
-      throw new \Exception('WRONG TYPE');
+      throw new \Exception('WRONG TYPE (' . $class . ') for ' . $value . '(' . gettype($this->data->$value) . ')');
     }
   }
 }
