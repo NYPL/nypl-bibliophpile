@@ -24,6 +24,8 @@ class Title extends ClientResource {
     parent::__construct($data, $client);
     $this->data->format = new Format($this->data->format);
     $this->initOptionalProperties();
+    $this->initSingleProperties();
+    $this->initSeries();
   }
 
   /**
@@ -47,14 +49,19 @@ class Title extends ClientResource {
     $this->initOptionalProperty('contents', 'array', array());
     $this->initOptionalProperty('performers', 'array', array());
     $this->initOptionalProperty('suitabilities', 'array', array());
+    $this->initOptionalProperty('notes', 'array', array());
     $this->initOptionalProperty('statement_of_responsibility', 'string');
-    $this->initOptionalProperty('number', 'string');
     $this->initOptionalProperty('physical_description', 'array', array());
 
     if ($this->data->availability !== NULL) {
       $this->data->availability = new Availability($this->data->availability);
     }
+  }
 
+  /**
+   * Flatten lists of single-property objects
+   */
+  protected function initSingleProperties() {
     $this->data->authors
       = $this->flattenSingleProperties($this->data->authors);
     $this->data->additional_contributors
@@ -67,6 +74,17 @@ class Title extends ClientResource {
       = $this->flattenSingleProperties($this->data->performers);
     $this->data->suitabilities
       = $this->flattenSingleProperties($this->data->suitabilities);
+  }
+
+  /**
+   * Convert series in objects of proper class
+   */ 
+  protected function initSeries() {
+    $seriesObjects = array();
+    foreach ($this->data->series as $s) {
+      $seriesObjects[] = new Series($s);
+    }
+    $this->data->series = $seriesObjects;
   }
 
   /**
@@ -113,6 +131,16 @@ class Title extends ClientResource {
   }
 
   /**
+   * Returns the title's subtitle.
+   *
+   * @return string
+   *   The name
+   */
+  public function subtitle() {
+    return $this->data->sub_title;
+  }
+
+  /**
    * Returns the title's availability.
    *
    * @return \NYPL\BiblioCommons\Api\Availability
@@ -130,6 +158,46 @@ class Title extends ClientResource {
    */
   public function authors() {
     return $this->data->authors;
+  }
+
+  /**
+   * Returns the title's isbns.
+   *
+   * @return array
+   *   The isbns
+   */
+  public function isbns() {
+    return $this->data->isbns;
+  }
+
+  /**
+   * Returns the title's upcs.
+   *
+   * @return array
+   *   The upcs
+   */
+  public function upcs() {
+    return $this->data->upcs;
+  }
+
+  /**
+   * Returns the title's call number.
+   *
+   * @return string
+   *   The call number
+   */
+  public function callNumber() {
+    return $this->data->call_number;
+  }
+
+  /**
+   * Returns the title's description.
+   *
+   * @return string
+   *   The description
+   */
+  public function description() {
+    return $this->data->description;
   }
 
   /**
@@ -153,6 +221,49 @@ class Title extends ClientResource {
   }
 
   /**
+   * Returns the title's pages.
+   *
+   * @return integer
+   *   The pages
+   */
+  public function pages() {
+    return $this->data->pages;
+  }
+
+  /**
+   * Returns the title's series.
+   *
+   * @return array
+   *   The series
+   */
+  public function series() {
+    return $this->data->series;
+  }
+
+  /**
+   * Returns the title's edition.
+   *
+   * @return string
+   *   The edition
+   */
+  public function edition() {
+    return $this->data->edition;
+  }
+
+  /**
+   * Returns the title's primary language.
+   *
+   * @return string
+   *   The language
+   */
+  public function primaryLanguage() {
+    if ($this->data->primary_language === NULL) {
+      return NULL;      
+    }
+    return $this->data->primary_language->name;
+  }
+
+  /**
    * Returns the title's languages.
    *
    * @return array
@@ -160,6 +271,16 @@ class Title extends ClientResource {
    */
   public function languages() {
     return $this->data->languages;
+  }
+
+  /**
+   * Returns the title's contents.
+   *
+   * @return array
+   *   The contents
+   */
+  public function contents() {
+    return $this->data->contents;
   }
 
   /**
@@ -180,5 +301,35 @@ class Title extends ClientResource {
    */
   public function suitabilities() {
     return $this->data->suitabilities;
+  }
+
+  /**
+   * Returns the title's notes.
+   *
+   * @return array
+   *   The notes
+   */
+  public function notes() {
+    return $this->data->notes;
+  }
+
+  /**
+   * Returns the title's statement of responsibility.
+   *
+   * @return string
+   *   The statement of responsibility
+   */
+  public function statementOfResponsibility() {
+    return $this->data->statement_of_responsibility;
+  }
+
+  /**
+   * Returns the title's physical description.
+   *
+   * @return array
+   *   The physical description
+   */
+  public function physicalDescription() {
+    return $this->data->physical_description;
   }
 }

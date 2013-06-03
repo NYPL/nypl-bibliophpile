@@ -139,10 +139,13 @@ $_title_response = <<<'JSON'
             "name": "Available"
         },
         "call_number": "CLASSICS FIC M",
-        "contents": [],
-        "description": "",
+        "contents": [
+            "First contents line",
+            "Second contents line"
+        ],
+        "description": "A description",
         "details_url": "http://any.bibliocommons.com/item/show/18708779052907",
-        "edition": "",
+        "edition": "The Edition",
         "format": {
             "id": "PAPERBACK",
             "name": "Paperback"
@@ -151,6 +154,10 @@ $_title_response = <<<'JSON'
         "isbns": [
             "0553213113",
             "9780553213119"
+        ],
+        "upcs": [
+            "1234567890",
+            "0987654321"
         ],
         "languages": [
             {
@@ -184,9 +191,14 @@ $_title_response = <<<'JSON'
                 "name": "Bantam Classic"
             }
         ],
-        "series": [],
+        "series": [
+            {
+                "name": "Series Title",
+                "number": "1"
+            }
+        ],
         "statement_of_responsibility": "Herman Melville ; edited and with an introduction by Charles Child Walcutt",
-        "sub_title": "",
+        "sub_title": "With a subtitle",
         "suitabilities": [
             {
                 "name": "First Suitability"
@@ -202,7 +214,7 @@ $_title_response = <<<'JSON'
 JSON;
 
 // Short version of previous response returned as part of the list of titles by
-// https://api.bibliocommons.com/v1/titles?api_key=...&q=Moby+Dick&library=nypl
+// Based onhttps://api.bibliocommons.com/v1/titles?api_key=...&q=Moby+Dick&library=nypl
 $_title_short_response = <<<'JSON'
 {
     "authors": [
@@ -220,15 +232,6 @@ $_title_short_response = <<<'JSON'
         "name": "Paperback"
     },
     "id": "18708779052907",
-    "isbns": [
-        "0553213113",
-        "9780553213119"
-    ],
-    "primary_language": {
-        "name": "English"
-    },
-    "publication_date": "2003",
-    "sub_title": "",
     "title": "Moby-Dick"
 }
 JSON;

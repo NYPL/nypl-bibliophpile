@@ -88,6 +88,23 @@ class TitleTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
+   * Some Titles have subtitles...
+   */
+  public function testHasSubtitle() {
+    $this->assertEquals(
+      'With a subtitle',
+      $this->title->subtitle()
+    );
+  }
+
+  /**
+   * ...this one doesn't
+   */
+  public function testCanHaveNoSubtitle() {
+    $this->assertNull($this->shortTitle->subtitle());
+  }
+
+  /**
    * Availability should return the right kind of object.
    */
   public function testReturnsAvailability() {
@@ -105,42 +122,286 @@ class TitleTest extends PHPUnit_Framework_TestCase {
    * authors() should return a list
    */
   public function testAuthorsReturnsArray() {
-    $this->assertInternalType('array', $this->title->authors());
+    $list = $this->title->authors();
+    $this->assertInternalType('array', $list);
+    $this->assertEquals("Melville, Herman", $list[0]);
   }
 
   /**
-   * additional_contributors() should return a list
+   * Some Titles have isbns...
+   */
+  public function testIsbnsReturnsArray() {
+    $list = $this->title->isbns();
+    $this->assertInternalType('array', $list);
+    $this->assertEquals('0553213113', $list[0]);
+  }
+
+  /**
+   * ...this one doesn't
+   */
+  public function testCanHaveNoIsbns() {
+    $this->assertEmpty($this->shortTitle->isbns());
+  }
+
+  /**
+   * Some Titles have UPCS...
+   */
+  public function testUpcsReturnsArray() {
+    $list = $this->title->upcs();
+    $this->assertInternalType('array', $list);
+    $this->assertEquals('1234567890', $list[0]);
+  }
+
+  /**
+   * ...this one doesn't
+   */
+  public function testCanHaveNoUpcs() {
+    $this->assertEmpty($this->shortTitle->upcs());
+  }
+
+  /**
+   * Some Titles have Call numbers...
+   */
+  public function testHasCallNumber() {
+    $this->assertEquals('CLASSICS FIC M', $this->title->callNumber());
+  }
+
+  /**
+   * ...this one doesn't
+   */
+  public function testCanHaveNoCallNumber() {
+    $this->assertNull($this->shortTitle->callNumber());
+  }
+
+  /**
+   * Some Titles have a description...
+   */
+  public function testHasDescription() {
+    $this->assertEquals('A description', $this->title->description());
+  }
+
+  /**
+   * ...this one doesn't
+   */
+  public function testCanHaveNoDescription() {
+    $this->assertNull($this->shortTitle->description());
+  }
+
+  /**
+   * Some Titles have a list of additional_contributors...
    */
   public function testAdditionalContributorsReturnsArray() {
-    $this->assertInternalType('array', $this->title->additionalContributors());
+    $list = $this->title->additionalContributors();
+    $this->assertInternalType('array', $list);
+    $this->assertEquals("Walcutt, Charles Child", $list[0]);
   }
 
   /**
-   * publishers() should return a list
+   * ...this one doesn't
+   */
+  public function testCanHaveNoAdditionalContributors() {
+    $this->assertEmpty($this->shortTitle->additionalContributors());
+  }
+
+  /**
+   * Some Titles have a list of publishers...
    */
   public function testPublishersReturnsArray() {
-    $this->assertInternalType('array', $this->title->publishers());
+    $list = $this->title->publishers();
+    $this->assertInternalType('array', $list);
+    $this->assertEquals("Bantam Classic", $list[0]);
   }
 
   /**
-   * languages() should return a list
+   * ...this one doesn't
+   */
+  public function testCanHaveNoPublishers() {
+    $this->assertEmpty($this->shortTitle->publishers());
+  }
+
+  /**
+   * Some Titles have a number of pages...
+   */
+  public function testHasPages() {
+    $this->assertEquals(670, $this->title->pages());
+  }
+
+  /**
+   * ...this one doesn't
+   */
+  public function testCanHaveNoPages() {
+    $this->assertNull($this->shortTitle->pages());
+  }
+
+  /**
+   * The number of pages should be an integer
+   */
+  public function testPagesReturnsAnInteger() {
+    $this->assertInternalType('integer', $this->title->pages());
+  }
+
+  /**
+   * Some Titles have a list of series...
+   */
+  public function testSeriesReturnsArray() {
+    $list = $this->title->series();
+    $this->assertInternalType('array', $list);
+    $this->assertEquals("Series Title", $list[0]->name());
+  }
+
+  /**
+   * ...this one doesn't
+   */
+  public function testCanHaveNoSeries() {
+    $this->assertEmpty($this->shortTitle->series());
+  }
+
+  /**
+   * The list of series should contain the right type of objects
+   */
+  public function testSeriesReturnsArrayOfSeries() {
+    $list = $this->title->series();
+    $this->assertInstanceOf('\NYPL\BiblioCommons\Api\Series', $list[0]);
+  }
+ 
+  /**
+   * Some Titles have an edition...
+   */
+  public function testHasEdition() {
+    $this->assertEquals('The Edition', $this->title->edition());
+  }
+
+  /**
+   * ...this one doesn't
+   */
+  public function testCanHaveNoEdition() {
+    $this->assertNull($this->shortTitle->edition());
+  }
+
+  /**
+   * Some Titles have a primary language...
+   */
+  public function testHasPrimaryLanguage() {
+    $this->assertEquals('English', $this->title->primaryLanguage());
+  }
+
+  /**
+   * ...this one doesn't
+   */
+  public function testCanHaveNoPrimaryLanguage() {
+    $this->assertNull($this->shortTitle->primaryLanguage());
+  }
+
+  /**
+   * Some titles have a list of languages...
    */
   public function testLanguagesReturnsArray() {
-    $this->assertInternalType('array', $this->title->languages());
+    $list = $this->title->languages();
+    $this->assertInternalType('array', $list);
+    $this->assertEquals("English", $list[0]);
   }
 
   /**
-   * performers() should return a list
+   * ...this one doesn't
+   */
+  public function testCanHaveNoLanguages() {
+    $this->assertEmpty($this->shortTitle->languages());
+  }
+
+  /**
+   * Some titles have a list of contents...
+   */
+  public function testContentsReturnsArray() {
+    $list = $this->title->contents();
+    $this->assertInternalType('array', $list);
+    $this->assertEquals("First contents line", $list[0]);
+  }
+
+  /**
+   * ...this one doesn't
+   */
+  public function testCanHaveNoContents() {
+    $this->assertEmpty($this->shortTitle->contents());
+  }
+
+  /**
+   * Some titles have a list of performers...
    */
   public function testPerformersReturnsArray() {
-    $this->assertInternalType('array', $this->title->performers());
+    $list = $this->title->performers();
+    $this->assertInternalType('array', $list);
+    $this->assertEquals("Performer One", $list[0]);
   }
 
   /**
-   * suitabilities() should return a list
+   * ...this one doesn't
+   */
+  public function testCanHaveNoPerformers() {
+    $this->assertEmpty($this->shortTitle->performers());
+  }
+
+  /**
+   * Some titles have a list of suitabilities...
    */
   public function testSuitabilitiesReturnsArray() {
-    $this->assertInternalType('array', $this->title->suitabilities());
+    $list = $this->title->suitabilities();
+    $this->assertInternalType('array', $list);
+    $this->assertEquals("First Suitability", $list[0]);
+  }
+
+  /**
+   * ...this one doesn't
+   */
+  public function testCanHaveNoSuitabilities() {
+    $this->assertEmpty($this->shortTitle->suitabilities());
+  }
+
+  /**
+   * Some titles have a list of notes...
+   */
+  public function testNotesReturnsArray() {
+    $list = $this->title->notes();
+    $this->assertInternalType('array', $list);
+    $this->assertEquals("\"First published in 1851.\"", $list[0]);
+  }
+
+  /**
+   * ...this one doesn't
+   */
+  public function testCanHaveNoNotes() {
+    $this->assertEmpty($this->shortTitle->notes());
+  }
+
+  /**
+   * Some Titles have a statement of responsibility...
+   */
+  public function testHasStatementOfResponsibility() {
+    $this->assertEquals(
+      'Herman Melville ; edited and with an introduction by Charles Child Walcutt', 
+      $this->title->statementOfResponsibility());
+  }
+
+  /**
+   * ...this one doesn't
+   */
+  public function testCanHaveNoStatementOfResponsibility() {
+    $this->assertNull($this->shortTitle->statementOfResponsibility());
+  }
+
+  /**
+   * Some titles have a list of physical description...
+   */
+  public function testPhysicalDescriptionReturnsArray() {
+    $list = $this->title->physicalDescription();
+    $this->assertInternalType('array', $list);
+    $this->assertEquals('xxvii, 670 p. ;,18 cm.', $list[0]);
+  }
+
+  /**
+   * ...this one doesn't
+   */
+  public function testCanHaveNoPhysicalDescription() {
+    $this->assertEmpty($this->shortTitle->physicalDescription());
   }
 
   /**
