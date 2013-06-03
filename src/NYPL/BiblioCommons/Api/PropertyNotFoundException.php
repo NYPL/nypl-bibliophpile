@@ -7,4 +7,4 @@
 
 namespace NYPL\BiblioCommons\Api;
 
-class JsonException extends BaseException {}
+class PropertyNotFoundException extends BaseException {}
