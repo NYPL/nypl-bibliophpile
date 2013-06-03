@@ -86,4 +86,18 @@ class TitleTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals('Paperback', $this->title->format()->name());
     $this->assertEquals('PAPERBACK', $this->title->format()->id());
   }
+
+  /**
+   * Availability should return the right kind of object.
+   */
+  public function testReturnsAvailability() {
+    // It should be an Availability object.
+    $this->assertInstanceOf(
+      'NYPL\BiblioCommons\Api\Availability',
+      $this->title->availability());
+
+    // It should be the right Availability.
+    $this->assertEquals('Available', $this->title->availability()->name());
+    $this->assertEquals('AVAILABLE', $this->title->availability()->id());
+  }
 }
