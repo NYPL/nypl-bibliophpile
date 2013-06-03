@@ -3,8 +3,6 @@
 
 PHP Wrapper for [BiblioCommons](http://www.bibliocommons.com/) API
 
-php composer.phar install
-
 ## Installation
 
 Clone the repository, `cd` onto your cloned directory and run composer:
