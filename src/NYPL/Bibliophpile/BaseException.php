@@ -5,7 +5,7 @@
  * BaseException class 
  */
 
-namespace NYPL\BiblioCommons\Api;
+namespace NYPL\Bibliophpile;
 
 /**
  * Base class for all exceptions in this Library.

@@ -5,7 +5,7 @@
  * SimpleResource class 
  */
 
-namespace NYPL\BiblioCommons\Api;
+namespace NYPL\Bibliophpile;
 
 class SimpleResource extends DataResource {
 

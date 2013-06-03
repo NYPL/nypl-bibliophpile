@@ -23,8 +23,8 @@ class LibraryTest extends PHPUnit_Framework_TestCase {
 
     $this->connStub = $this->getMock('HTTP_Request2');
     $this->client
-      = new NYPL\BiblioCommons\Api\Client('abcdef', $this->connStub);
-    $this->library = new NYPL\BiblioCommons\Api\Library(
+      = new NYPL\Bibliophpile\Client('abcdef', $this->connStub);
+    $this->library = new NYPL\Bibliophpile\Library(
       json_decode($_library_response)->library,
       $this->client);
   }
@@ -33,7 +33,7 @@ class LibraryTest extends PHPUnit_Framework_TestCase {
    * Make sure we can we build a library from JSON.
    */
   public function testConstructorWorks() {
-    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Library', $this->library);
+    $this->assertInstanceOf('NYPL\Bibliophpile\Library', $this->library);
   }
 
   /**
@@ -92,7 +92,7 @@ class LibraryTest extends PHPUnit_Framework_TestCase {
     $this->assertInternalType('array', $locations);
 
     // It should be an array of Location objects.
-    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Location', $locations[0]);
+    $this->assertInstanceOf('NYPL\Bibliophpile\Location', $locations[0]);
 
     // It should be an array of the right Location objects.
     $this->assertEquals('115th Street', $locations[0]->name());

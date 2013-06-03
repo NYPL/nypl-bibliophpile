@@ -5,6 +5,6 @@
  * Format class 
  */
 
-namespace NYPL\BiblioCommons\Api;
+namespace NYPL\Bibliophpile;
 
 class PropertyNotFoundException extends BaseException {}

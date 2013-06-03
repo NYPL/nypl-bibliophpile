@@ -5,7 +5,7 @@
  * Client class
  */
 
-namespace NYPL\BiblioCommons\Api;
+namespace NYPL\Bibliophpile;
 
 /**
  * Client provides for all the communication between the BiblioCommons API and
@@ -95,7 +95,7 @@ class Client {
    * @return StdObj
    *   The parsed JSON
    *
-   * @throws NYPL\BiblioCommons\Api\JsonException 
+   * @throws NYPL\Bibliophpile\JsonException 
    *   When the JSON response cannot be parsed
    */
   public function getEndpoint($path, $params = array()) {

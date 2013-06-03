@@ -18,7 +18,7 @@ class DataResourceTest extends PHPUnit_Framework_TestCase {
     // We're going to use Series as an example DataResource.
     global $_series_response_no_number;
 
-    $this->resource = new NYPL\BiblioCommons\Api\Series(
+    $this->resource = new NYPL\Bibliophpile\Series(
       json_decode($_series_response_no_number));
   }
 
@@ -26,7 +26,7 @@ class DataResourceTest extends PHPUnit_Framework_TestCase {
    * Make sure we can we build a resource from JSON.
    */
   public function testConstructorWorks() {
-    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Series', $this->resource);
+    $this->assertInstanceOf('NYPL\Bibliophpile\Series', $this->resource);
   }
 
   /**

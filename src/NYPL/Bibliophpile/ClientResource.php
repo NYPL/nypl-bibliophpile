@@ -5,7 +5,7 @@
  * ClientResource class 
  */
 
-namespace NYPL\BiblioCommons\Api;
+namespace NYPL\Bibliophpile;
 
 /**
  * ClientResource is the base class for all resources that have a reference to

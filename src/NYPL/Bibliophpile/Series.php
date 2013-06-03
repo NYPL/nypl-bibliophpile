@@ -5,7 +5,7 @@
  * Location class 
  */
 
-namespace NYPL\BiblioCommons\Api;
+namespace NYPL\Bibliophpile;
 
 class Series extends DataResource {
 

@@ -18,7 +18,7 @@ class LocationTest extends PHPUnit_Framework_TestCase {
 
     global $_locations_response;
 
-    $this->location = new NYPL\BiblioCommons\Api\Location(
+    $this->location = new NYPL\Bibliophpile\Location(
       json_decode($_locations_response)->locations[0]);
   }
 
@@ -26,7 +26,7 @@ class LocationTest extends PHPUnit_Framework_TestCase {
    * Make sure we can we build a location from JSON.
    */
   public function testConstructorWorks() {
-    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Location', $this->location);
+    $this->assertInstanceOf('NYPL\Bibliophpile\Location', $this->location);
   }
 
   /**

@@ -5,7 +5,7 @@
  * DataResource class 
  */
 
-namespace NYPL\BiblioCommons\Api;
+namespace NYPL\Bibliophpile;
 
 class DataResource {
 
@@ -130,7 +130,7 @@ class DataResource {
    *
    * @return array
    *   The flattened list of properties
-   * @throws \NYPL\BiblioCommons\API\PropertyNotFoundException
+   * @throws \NYPL\Bibliophpile\PropertyNotFoundException
    *   When the given property does not exist in the object 
    */
   protected function flattenSingleProperties($list, $prop = 'name') {

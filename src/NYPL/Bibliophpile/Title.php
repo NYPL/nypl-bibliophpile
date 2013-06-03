@@ -5,7 +5,7 @@
  * Library class 
  */
 
-namespace NYPL\BiblioCommons\Api;
+namespace NYPL\Bibliophpile;
 
 class Title extends ClientResource {
 
@@ -123,7 +123,7 @@ class Title extends ClientResource {
   /**
    * Returns the title's format.
    *
-   * @return \NYPL\BiblioCommons\Api\Format
+   * @return \NYPL\Bibliophpile\Format
    *   The format
    */
   public function format() {
@@ -143,7 +143,7 @@ class Title extends ClientResource {
   /**
    * Returns the title's availability.
    *
-   * @return \NYPL\BiblioCommons\Api\Availability
+   * @return \NYPL\Bibliophpile\Availability
    *   The availability
    */
   public function availability() {

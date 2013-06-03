@@ -18,7 +18,7 @@ class FormatTest extends PHPUnit_Framework_TestCase {
 
     global $_title_response;
 
-    $this->format = new NYPL\BiblioCommons\Api\Format(
+    $this->format = new NYPL\Bibliophpile\Format(
       json_decode($_title_response)->title->format);
   }
 
@@ -26,7 +26,7 @@ class FormatTest extends PHPUnit_Framework_TestCase {
    * Make sure we can we build a location from JSON.
    */
   public function testConstructorWorks() {
-    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Format', $this->format);
+    $this->assertInstanceOf('NYPL\Bibliophpile\Format', $this->format);
   }
 
   /**

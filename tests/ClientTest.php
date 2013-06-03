@@ -28,7 +28,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
   }
 
   public function testMinimalConstructorWorks() {
-    $client = new NYPL\BiblioCommons\Api\Client('abcdef');
+    $client = new NYPL\Bibliophpile\Client('abcdef');
 
     # It saved the key we passed
     $this->assertEquals('abcdef', $client->apikey());
@@ -40,7 +40,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
   public function testOptionalConstructorWorks() {
     $conn = new \HTTP_Request2();
 
-    $client = new NYPL\BiblioCommons\Api\Client('abcdef', $conn);
+    $client = new NYPL\Bibliophpile\Client('abcdef', $conn);
 
     # It saved the key we passed
     $this->assertEquals('abcdef', $client->apikey());
@@ -58,7 +58,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
       ->method('getBody')
       ->will($this->returnValue($_library_response));
 
-    $client = new NYPL\BiblioCommons\Api\Client('abcdef', $this->conn_stub);
+    $client = new NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
 
     $this->assertEquals(
       'New York Public Library', 
@@ -66,7 +66,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
   }
 
   /**
-   * @expectedException \NYPL\BiblioCommons\Api\JsonException
+   * @expectedException \NYPL\Bibliophpile\JsonException
    */
   public function testRaisesExceptionForBadJson() {
     // $conn_stub = $this->getMock('HTTP_Request2');
@@ -76,7 +76,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_bad_json));
-    $client = new NYPL\BiblioCommons\Api\Client('abcdef', $this->conn_stub);
+    $client = new NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
     $client->getEndpoint('libraries/nypl');
   }
 
@@ -94,11 +94,11 @@ class ClientTest extends PHPUnit_Framework_TestCase
       ->method('getBody')
       ->will($this->returnValue($_library_response));
 
-    $client = new \NYPL\BiblioCommons\Api\Client('abcdef', $this->conn_stub);
+    $client = new \NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
     $library = $client->library('nypl');
 
     # It should be a Library
-    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Library', $library);
+    $this->assertInstanceOf('NYPL\Bibliophpile\Library', $library);
 
     # It should have the right name
     $this->assertEquals('New York Public Library', $library->name());
@@ -113,14 +113,14 @@ class ClientTest extends PHPUnit_Framework_TestCase
       ->method('getBody')
       ->will($this->returnValue($_locations_response));
 
-    $client = new \NYPL\BiblioCommons\Api\Client('abcdef', $this->conn_stub);
+    $client = new \NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
     $locations = $client->locations('nypl');
 
     // It should return an array
     $this->assertInternalType('array', $locations);
 
     // It should be an array of Location objects
-    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Location', $locations[0]);
+    $this->assertInstanceOf('NYPL\Bibliophpile\Location', $locations[0]);
 
     // It should be an array of the right Location objects
     $this->assertEquals('115th Street', $locations[0]->name());

@@ -25,14 +25,14 @@ class TitleTest extends PHPUnit_Framework_TestCase {
 
     $this->connStub = $this->getMock('HTTP_Request2');
     $this->client
-      = new NYPL\BiblioCommons\Api\Client('abcdef', $this->connStub);
-    $this->title = new NYPL\BiblioCommons\Api\Title(
+      = new NYPL\Bibliophpile\Client('abcdef', $this->connStub);
+    $this->title = new NYPL\Bibliophpile\Title(
       json_decode($_title_response)->title,
       $this->client);
 
     // When returned as part of a list of titles, many fields are left out of
     // the response.
-    $this->shortTitle = new NYPL\BiblioCommons\Api\Title(
+    $this->shortTitle = new NYPL\Bibliophpile\Title(
       json_decode($_title_short_response),
       $this->client);
   }
@@ -41,14 +41,14 @@ class TitleTest extends PHPUnit_Framework_TestCase {
    * Make sure we can we build a title from JSON.
    */
   public function testConstructorWorksForShortObject() {
-    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Title', $this->shortTitle);
+    $this->assertInstanceOf('NYPL\Bibliophpile\Title', $this->shortTitle);
   }
 
   /**
    * Make sure we can we build a title from JSON.
    */
   public function testConstructorWorksForFullObject() {
-    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Title', $this->title);
+    $this->assertInstanceOf('NYPL\Bibliophpile\Title', $this->title);
   }
 
   /**
@@ -80,7 +80,7 @@ class TitleTest extends PHPUnit_Framework_TestCase {
    */
   public function testHasFormat() {
     // It should be a Format object.
-    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Format', $this->title->format());
+    $this->assertInstanceOf('NYPL\Bibliophpile\Format', $this->title->format());
 
     // It should be the right Format.
     $this->assertEquals('Paperback', $this->title->format()->name());
@@ -110,7 +110,7 @@ class TitleTest extends PHPUnit_Framework_TestCase {
   public function testReturnsAvailability() {
     // It should be an Availability object.
     $this->assertInstanceOf(
-      'NYPL\BiblioCommons\Api\Availability',
+      'NYPL\Bibliophpile\Availability',
       $this->title->availability());
 
     // It should be the right Availability.
@@ -261,7 +261,7 @@ class TitleTest extends PHPUnit_Framework_TestCase {
    */
   public function testSeriesReturnsArrayOfSeries() {
     $list = $this->title->series();
-    $this->assertInstanceOf('\NYPL\BiblioCommons\Api\Series', $list[0]);
+    $this->assertInstanceOf('\NYPL\Bibliophpile\Series', $list[0]);
   }
  
   /**

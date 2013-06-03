@@ -18,7 +18,7 @@ class AvailabilityTest extends PHPUnit_Framework_TestCase {
 
     global $_title_short_response;
 
-    $this->availability = new NYPL\BiblioCommons\Api\Location(
+    $this->availability = new NYPL\Bibliophpile\Location(
       json_decode($_title_short_response)->availability);
   }
 
@@ -26,7 +26,7 @@ class AvailabilityTest extends PHPUnit_Framework_TestCase {
    * Make sure we can we build a location from JSON.
    */
   public function testConstructorWorks() {
-    $this->assertInstanceOf('NYPL\BiblioCommons\Api\Location', $this->availability);
+    $this->assertInstanceOf('NYPL\Bibliophpile\Location', $this->availability);
   }
 
   /**

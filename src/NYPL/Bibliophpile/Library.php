@@ -5,7 +5,7 @@
  * Library class 
  */
 
-namespace NYPL\BiblioCommons\Api;
+namespace NYPL\Bibliophpile;
 
 class Library extends ClientResource {
 

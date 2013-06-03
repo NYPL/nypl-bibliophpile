@@ -5,6 +5,6 @@
  * Location class 
  */
 
-namespace NYPL\BiblioCommons\Api;
+namespace NYPL\Bibliophpile;
 
 class Availability extends SimpleResource {}
