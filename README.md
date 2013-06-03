@@ -1,5 +1,5 @@
 
-# NYPL Bibliophile
+# NYPL Bibliophpile
 
 PHP Wrapper for [BiblioCommons](http://www.bibliocommons.com/) API
 
