@@ -125,5 +125,28 @@ class ClientTest extends PHPUnit_Framework_TestCase
     // It should be an array of the right Location objects
     $this->assertEquals('115th Street', $locations[0]->name());
   }
+
+  public function testRetrievesTitleById() {
+
+    global $_title_response;
+    $this->conn_stub->expects($this->any())
+      ->method('setUrl')
+      ->with($this->equalTo('https://api.bibliocommons.com/v1/titles/18708779052907'));
+    $this->url_stub->expects($this->any())
+      ->method('setQueryVariables')
+      ->with($this->arrayHasKey('api_key'));
+    $this->response_stub->expects($this->any())
+      ->method('getBody')
+      ->will($this->returnValue($_title_response));
+
+    $client = new \NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
+    $title = $client->title('18708779052907');
+
+    # It should be a Library
+    $this->assertInstanceOf('NYPL\Bibliophpile\Title', $title);
+
+    # It should have the right name
+    $this->assertEquals('Moby-Dick', $title->name());
+  }
 }
 

@@ -147,4 +147,19 @@ class Client {
     }
     return $locations;
   }
+
+  /**
+   * Get a Title by ID.
+   *
+   * @param string $id
+   *   The title's id
+   *
+   * @return Title
+   *   The Title object
+   */
+  public function title($id) {
+    $path = 'titles/' . $id;
+    return new Title($this->getEndPoint($path)->title, $this);
+  }
+
 }
