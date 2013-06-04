@@ -17,7 +17,7 @@ class DataResource {
   protected $data;
 
   /**
-   * SimpleResource object constructor.
+   * DataResource object constructor.
    *
    * @param StdObj $data 
    *   Parsed JSON for the object.
@@ -36,7 +36,7 @@ class DataResource {
    * endpoint, they are missing many of the fields that would be returned for 
    * the same title by the titles/{id} endpoint. Within the title JSON object,
    * lack of an 'availability' is expressed as null, lack of authors as an
-   * empty array, and lack of a subtitle as an empty string. 
+   * empty array, and lack of a subtitle as an empty string.
    *
    * In order to smooth over this unmethodical variety, this method takes the 
    * name of a property its expected type and optional null value (default 
@@ -44,11 +44,11 @@ class DataResource {
    * name exists and is of the given type, the value is returned. Otherwise, the
    * given null or empty value is returned.
    *
-   * @param mixed $value 
+   * @param mixed $value
    *   Name of property to be looked up in the object's $data property.
-   * @param string $class 
+   * @param string $class
    *   Expected class for the property.
-   * @param mixed $null_value 
+   * @param mixed $null_value
    *   Value to be returned if the property is null, empty, or missing.
    */
   protected function initOptionalProperty($value, $class, $null_value = NULL) {

@@ -9,7 +9,7 @@ namespace NYPL\Bibliophpile;
 
 /**
  * ClientResource is the base class for all resources that have a reference to
- * to the master client and can therefor make additional API requests
+ * to the master client and can therefore make additional API requests.
  */
 class ClientResource extends DataResource {
 

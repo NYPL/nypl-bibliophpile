@@ -99,7 +99,7 @@ class Client {
    *   When the JSON response cannot be parsed
    */
   public function getEndpoint($path, $params = array()) {
-    $all_params = array_merge($params, array('api_key' => 'few2vjhmdnhjhw7xnajj9wxt'));
+    $all_params = array_merge($params, array('api_key' => $this->apikey));
     $url = implode('/', array(
       self::API_BASE,
       self::API_VERSION,

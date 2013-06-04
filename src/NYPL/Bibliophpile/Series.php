@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Location class 
+ * Series class 
  */
 
 namespace NYPL\Bibliophpile;

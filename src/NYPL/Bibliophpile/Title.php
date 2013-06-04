@@ -77,7 +77,7 @@ class Title extends ClientResource {
   }
 
   /**
-   * Convert series in objects of proper class
+   * Convert series in objects of proper class.
    */ 
   protected function initSeries() {
     $seriesObjects = array();
