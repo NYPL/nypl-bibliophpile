@@ -28,10 +28,10 @@ class ClientTest extends PHPUnit_Framework_TestCase
   }
 
   public function testMinimalConstructorWorks() {
-    $client = new NYPL\Bibliophpile\Client('few2vjhmdnhjhw7xnajj9wxt');
+    $client = new NYPL\Bibliophpile\Client('abcdef');
 
     # It saved the key we passed
-    $this->assertEquals('few2vjhmdnhjhw7xnajj9wxt', $client->apikey());
+    $this->assertEquals('abcdef', $client->apikey());
 
     # created it own HTTP client
     $this->assertInstanceOf('HTTP_Request2', $client->conn());
@@ -40,10 +40,10 @@ class ClientTest extends PHPUnit_Framework_TestCase
   public function testOptionalConstructorWorks() {
     $conn = new \HTTP_Request2();
 
-    $client = new NYPL\Bibliophpile\Client('few2vjhmdnhjhw7xnajj9wxt', $conn);
+    $client = new NYPL\Bibliophpile\Client('abcdef', $conn);
 
     # It saved the key we passed
-    $this->assertEquals('few2vjhmdnhjhw7xnajj9wxt', $client->apikey());
+    $this->assertEquals('abcdef', $client->apikey());
 
     # It saved the HTTP client we passed
     $this->assertSame($conn, $client->conn());
@@ -58,7 +58,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
       ->method('getBody')
       ->will($this->returnValue($_library_response));
 
-    $client = new NYPL\Bibliophpile\Client('few2vjhmdnhjhw7xnajj9wxt', $this->conn_stub);
+    $client = new NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
 
     $this->assertEquals(
       'New York Public Library', 
@@ -76,7 +76,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_bad_json));
-    $client = new NYPL\Bibliophpile\Client('few2vjhmdnhjhw7xnajj9wxt', $this->conn_stub);
+    $client = new NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
     $client->getEndpoint('libraries/nypl');
   }
 
@@ -94,7 +94,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
       ->method('getBody')
       ->will($this->returnValue($_library_response));
 
-    $client = new \NYPL\Bibliophpile\Client('few2vjhmdnhjhw7xnajj9wxt', $this->conn_stub);
+    $client = new \NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
     $library = $client->library('nypl');
 
     # It should be a Library
@@ -113,7 +113,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
       ->method('getBody')
       ->will($this->returnValue($_locations_response));
 
-    $client = new \NYPL\Bibliophpile\Client('few2vjhmdnhjhw7xnajj9wxt', $this->conn_stub);
+    $client = new \NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
     $locations = $client->locations('nypl');
 
     // It should return an array
@@ -139,7 +139,7 @@ class ClientTest extends PHPUnit_Framework_TestCase
       ->method('getBody')
       ->will($this->returnValue($_title_response));
 
-    $client = new \NYPL\Bibliophpile\Client('few2vjhmdnhjhw7xnajj9wxt', $this->conn_stub);
+    $client = new \NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
     $title = $client->title('18708779052907');
 
     # It should be a Library
