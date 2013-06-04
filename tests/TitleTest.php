@@ -25,7 +25,7 @@ class TitleTest extends PHPUnit_Framework_TestCase {
 
     $this->connStub = $this->getMock('HTTP_Request2');
     $this->client
-      = new NYPL\Bibliophpile\Client('abcdef', $this->connStub);
+      = new NYPL\Bibliophpile\Client('few2vjhmdnhjhw7xnajj9wxt', $this->connStub);
     $this->title = new NYPL\Bibliophpile\Title(
       json_decode($_title_response)->title,
       $this->client);

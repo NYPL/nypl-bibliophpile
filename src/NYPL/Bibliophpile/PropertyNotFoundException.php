@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Format class 
+ * PropertyNotFoundException class 
  */
 
 namespace NYPL\Bibliophpile;
