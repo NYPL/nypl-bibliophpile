@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Format class 
+ * JsonException class 
  */
 
 namespace NYPL\Bibliophpile;
