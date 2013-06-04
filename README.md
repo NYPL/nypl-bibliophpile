@@ -1,4 +1,3 @@
-
 # NYPL Bibliophpile
 
 PHP Wrapper for [BiblioCommons](http://www.bibliocommons.com/) API
@@ -7,6 +6,7 @@ PHP Wrapper for [BiblioCommons](http://www.bibliocommons.com/) API
 
 Clone the repository, `cd` onto your cloned directory and run composer:
 
+    php composer.phar install 
     php composer.phar install --dev
 
 
