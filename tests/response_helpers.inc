@@ -250,5 +250,12 @@ $_series_response_no_number = <<<'JSON'
 }
 JSON;
 
+$_status_response = <<<'JSON'
+{
+    "id": "AVAILABLE",
+    "name": "Available"
+}
+JSON;
+
 $_bad_json = "This isn't JSON";
 
