@@ -25,3 +25,14 @@ Retrieve a title by its ID (NB, the IDs are numeric, but still strings):
 
     $title = $client->title('18708779052907');
     echo $title->name(); // "Moby-Dick";
+
+Retrieve the copies of a title:
+
+    $copies = $title->copies(); // Array of copy objects
+
+You can also get the copies from the client with the title’s ID:
+
+    $copies = $client->copies('18708779052907');
+
+
+
