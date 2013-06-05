@@ -11,6 +11,7 @@ class TitleTest extends PHPUnit_Framework_TestCase {
 
   protected $connStub;
   protected $responseStub;
+  protected $urlStub;
   protected $client;
   protected $title;
   protected $shortTitle;
@@ -24,6 +25,13 @@ class TitleTest extends PHPUnit_Framework_TestCase {
     global $_title_short_response;
 
     $this->connStub = $this->getMock('HTTP_Request2');
+    $this->responseStub = $this->getMockBuilder('HTTP_Request2_Response')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->urlStub = $this->getMockBuilder('Net_URL2')
+      ->disableOriginalConstructor()
+      ->getMock();
+
     $this->client
       = new NYPL\Bibliophpile\Client('abcdef', $this->connStub);
     $this->title = new NYPL\Bibliophpile\Title(
@@ -451,5 +459,61 @@ class TitleTest extends PHPUnit_Framework_TestCase {
   public function testListOfSuitabilitiesIsFlattened() {
     $list = $this->title->suitabilities();
     $this->assertInternalType('string', $list[0]);
+  }
+
+  public function testReturnsCopies() {
+    global $_title_copies_response;
+    $this->connStub->expects($this->any())
+      ->method('setUrl')
+      ->with($this->equalTo('https://api.bibliocommons.com/v1/titles/18708779052907/copies'));
+    $this->connStub->expects($this->any())
+      ->method('send')
+      ->will($this->returnValue($this->responseStub));
+    $this->connStub->expects($this->any())
+      ->method('getUrl')
+      ->will($this->returnValue($this->urlStub));
+    $this->urlStub->expects($this->any())
+      ->method('setQueryVariables')
+      ->with($this->arrayHasKey('api_key'));
+    $this->responseStub->expects($this->any())
+      ->method('getBody')
+      ->will($this->returnValue($_title_copies_response));
+
+    $copies = $this->title->copies();
+
+    # It should return an array
+    $this->assertInternalType('array', $copies);
+
+    // It should be an array of Copy objects
+    $this->assertInstanceOf('NYPL\Bibliophpile\Copy', $copies[0]);
+
+    // It should be an array of the right Copy objects
+    $this->assertEquals('Fort Washington Fiction', $copies[0]->collection());
+  }
+
+  /**
+   * Make two calls to Title::copies() and make sure that the copies are cached
+   * and that the underlying Client method is only called once.
+   */
+  public function testCachesCopies() {
+    global $_title_copies_response;
+    $this->connStub->expects($this->any())
+      ->method('setUrl')
+      ->with($this->equalTo('https://api.bibliocommons.com/v1/titles/18708779052907/copies'));
+    $this->connStub->expects($this->any())
+      ->method('send')
+      ->will($this->returnValue($this->responseStub));
+    $this->connStub->expects($this->any())
+      ->method('getUrl')
+      ->will($this->returnValue($this->urlStub));
+    $this->urlStub->expects($this->any())
+      ->method('setQueryVariables')
+      ->with($this->arrayHasKey('api_key'));
+    $this->responseStub->expects($this->once())
+      ->method('getBody')
+      ->will($this->returnValue($_title_copies_response));
+
+    $this->title->copies();
+    $this->title->copies();
   }
 }

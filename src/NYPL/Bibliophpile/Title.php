@@ -11,6 +11,7 @@ class Title extends ClientResource {
 
   protected $format;
   protected $availability;
+  protected $copies;
 
   /**
    * Title object constructor.
@@ -26,6 +27,7 @@ class Title extends ClientResource {
     $this->initOptionalProperties();
     $this->initSingleProperties();
     $this->initSeries();
+    $this->copies = NULL;
   }
 
   /**
@@ -331,5 +333,12 @@ class Title extends ClientResource {
    */
   public function physicalDescription() {
     return $this->data->physical_description;
+  }
+
+  public function copies() {
+    if ($this->copies === NULL) {
+      $this->copies = $this->client->copies($this->data->id);
+    }
+    return $this->copies;
   }
 }
