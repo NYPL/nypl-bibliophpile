@@ -162,4 +162,23 @@ class Client {
     return new Title($this->getEndPoint($path)->title, $this);
   }
 
+  /**
+   * Get a Copies of a title by title ID.
+   *
+   * @param string $id
+   *   The title's id
+   *
+   * @return array
+   *   Array of Copy objects
+   */
+  public function copies($id) {
+    $path = 'titles/' . $id . '/copies';
+    $data = $this->getEndPoint($path);
+    $copies = array();
+    foreach ($data->copies as $copy) {
+      $copies[] = new Copy($copy);
+    }
+    return $copies;
+  }
+
 }

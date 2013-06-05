@@ -236,6 +236,117 @@ $_title_short_response = <<<'JSON'
 }
 JSON;
 
+$_title_copies_response = <<<'JSON'
+{
+    "copies": [
+        {
+            "call_number": "CLASSICS FIC M", 
+            "collection": "Fort Washington Fiction", 
+            "library_status": "DUE", 
+            "location": {
+                "id": "52-FW", 
+                "name": "Fort Washington"
+            }, 
+            "status": {
+                "id": "UNAVAILABLE", 
+                "name": "All copies in use"
+            }
+        }, 
+        {
+            "call_number": "CLASSICS FIC M", 
+            "collection": "Fort Washington Fiction", 
+            "library_status": "AVAILABLE", 
+            "location": {
+                "id": "52-FW", 
+                "name": "Fort Washington"
+            }, 
+            "status": {
+                "id": "AVAILABLE", 
+                "name": "Available"
+            }
+        }, 
+        {
+            "call_number": "CLASSICS FIC M", 
+            "collection": "Francis Martin Fiction", 
+            "library_status": "AVAILABLE", 
+            "location": {
+                "id": "52-FX", 
+                "name": "Francis Martin"
+            }, 
+            "status": {
+                "id": "AVAILABLE", 
+                "name": "Available"
+            }
+        }, 
+        {
+            "call_number": "CLASSICS FIC M", 
+            "collection": "Grand Central Fiction", 
+            "library_status": "DUE", 
+            "location": {
+                "id": "52-GC", 
+                "name": "Grand Central"
+            }, 
+            "status": {
+                "id": "UNAVAILABLE", 
+                "name": "All copies in use"
+            }
+        }, 
+        {
+            "call_number": "CLASSICS FIC M", 
+            "collection": "Grand Central Fiction", 
+            "library_status": "AVAILABLE", 
+            "location": {
+                "id": "52-GC", 
+                "name": "Grand Central"
+            }, 
+            "status": {
+                "id": "AVAILABLE", 
+                "name": "Available"
+            }
+        }, 
+        {
+            "call_number": "CLASSICS FIC M", 
+            "collection": "Parkchester Fiction", 
+            "library_status": "DUE", 
+            "location": {
+                "id": "52-PK", 
+                "name": "Parkchester"
+            }, 
+            "status": {
+                "id": "UNAVAILABLE", 
+                "name": "All copies in use"
+            }
+        }, 
+        {
+            "call_number": "CLASSICS FIC M", 
+            "collection": "Pelham Bay Fiction", 
+            "library_status": "DUE", 
+            "location": {
+                "id": "52-PM", 
+                "name": "Pelham Bay"
+            }, 
+            "status": {
+                "id": "UNAVAILABLE", 
+                "name": "All copies in use"
+            }
+        }, 
+        {
+            "call_number": "CLASSICS FIC M", 
+            "collection": "Pelham Bay Fiction", 
+            "library_status": "AVAILABLE", 
+            "location": {
+                "id": "52-PM", 
+                "name": "Pelham Bay"
+            }, 
+            "status": {
+                "id": "AVAILABLE", 
+                "name": "Available"
+            }
+        }
+    ]
+}
+JSON;
+
 $_series_response_number = <<<'JSON'
 {
     "name": "Series Title",
