@@ -10,14 +10,14 @@ Find a library by its ID:
     $library = $client->library('nypl');
     echo $library->name(); // "New York Public Library"
 
-Retrieve the library's locations:
+Retrieve the library’s locations:
 
     $locations = $library->locations();
-    echo $locations[0]; // "115th Street"
+    echo $locations[0]->name(); // "115th Street"
 
-You can also get the locations directly:
+You can also get the locations directly from the client with the library’s id:
 
-    $client->locations('nypl');
+    $locations = $client->locations('nypl');
 
 ## Titles
 
