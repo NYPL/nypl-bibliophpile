@@ -32,3 +32,11 @@ To install PHPDocumentor:
 	pear install phpdoc/phpDocumentor-alpha
 
 NOTE: You may have to also install <a href="http://www.graphviz.org/">GraphViz</a> in order for phpdoc to run without errors.
+
+## Run the Demo
+
+If your are using PHP 5.4 or greater, you can use the built-in web server to run the demo:
+
+    php -S localhost:8000
+
+Then go to browser and open `http://localhost:8000/demo.php`
