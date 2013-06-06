@@ -32,6 +32,16 @@ $_locations_response = <<<'JSON'
 }
 JSON;
 
+$_users_by_id_response = <<<'JSON'
+{
+    "user": {
+        "id": "123456789",
+        "name": "fakeuser",
+        "profile_url": "http://any.bibliocommons.com/collection/show/123456789"
+    }
+}
+JSON;
+
 // https://api.bibliocommons.com/v1/lists?api_key=...
 $_lists_response = <<<'JSON'
 {
