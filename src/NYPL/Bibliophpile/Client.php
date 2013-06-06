@@ -181,4 +181,19 @@ class Client {
     return $copies;
   }
 
+  /**
+   * Get a User by ID.
+   *
+   * @param string $id
+   *   The users's id
+   *
+   * @return User
+   *   The User object
+   */
+  public function user($id) {
+    $path = 'users/' . $id;
+    return new User($this->getEndPoint($path)->user, $this);
+  }
+
+
 }

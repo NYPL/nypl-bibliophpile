@@ -174,5 +174,28 @@ class ClientTest extends PHPUnit_Framework_TestCase
     // It should be an array of the right Copy objects
     $this->assertEquals('Fort Washington Fiction', $copies[0]->collection());
   }
+
+  public function testRetrievesUserById() {
+
+    global $_users_by_id_response;
+    $this->conn_stub->expects($this->any())
+      ->method('setUrl')
+      ->with($this->equalTo('https://api.bibliocommons.com/v1/users/123456789'));
+    $this->url_stub->expects($this->any())
+      ->method('setQueryVariables')
+      ->with($this->arrayHasKey('api_key'));
+    $this->response_stub->expects($this->any())
+      ->method('getBody')
+      ->will($this->returnValue($_users_by_id_response));
+
+    $client = new \NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
+    $user = $client->user('123456789');
+
+    # It should be a Library
+    $this->assertInstanceOf('NYPL\Bibliophpile\User', $user);
+
+    # It should have the right name
+    $this->assertEquals('fakeuser', $user->name());
+  }
 }
 
