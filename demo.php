@@ -74,6 +74,7 @@ HTML;
     }
 
     public function prettyPrint() {
+        print_r($this->resource);
         return <<<HTML
 <ul>
     <li>ID: {$this->resource->id()}</li>
@@ -104,6 +105,30 @@ HTML;
 
 }
 
+class CopiesPrinter extends PrettyPrinter
+{
+    public function prettyPrint() {
+        $formatted = "";
+        foreach ($this->resource as $copy) {
+
+            $formatted .= <<<HTML
+<li>
+    <ul>
+        <li>Collection: {$copy->collection()}</li>
+        <li>Call Number: {$copy->callNumber()}</li>
+        <li>Library Status: {$copy->libraryStatus()}</li>
+        <li>Location: {$this->formatSimpleResource($copy->location())}</li>
+        <li>Status: {$this->formatSimpleResource($copy->status())}</li>
+    </ul>
+</li>
+HTML;
+        }
+        $formatted = "<ul>" . $formatted . "</ul>";
+        return $formatted;
+    }
+
+}
+
 if (isset($_POST['apikey'])) {
     $apikey = $_POST['apikey'];
     $searchtype = $_POST['searchtype'];
@@ -115,6 +140,8 @@ if (isset($_POST['apikey'])) {
         $resource = new LibraryPrinter($client->library($q));
     } elseif ($searchtype === 'title-by-id') {
         $resource = new TitlePrinter($client->title($q));
+    } elseif ($searchtype === 'copies-by-id') {
+        $resource = new CopiesPrinter($client->copies($q));
     }
 
 } else {
@@ -161,6 +188,15 @@ if (isset($_POST['apikey'])) {
                         value="title-by-id"
                         <?php if ($searchtype==='title-by-id') {?> checked="checked"<?php } ?>>
                     <label for="radio-title">Title by ID (ex: “18708779052907”)</label>
+                </li>
+                <li>
+                    <input
+                        id="radio-copies"
+                        name="searchtype"
+                        type="radio" 
+                        value="copies-by-id"
+                        <?php if ($searchtype==='copies-by-id') {?> checked="checked"<?php } ?>>
+                    <label for="radio-title">Copies of a title by ID (ex: “18708779052907”)</label>
                 </li>
             </ol>
         </fieldset>
