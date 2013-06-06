@@ -74,7 +74,6 @@ HTML;
     }
 
     public function prettyPrint() {
-        print_r($this->resource);
         return <<<HTML
 <ul>
     <li>ID: {$this->resource->id()}</li>
