@@ -149,6 +149,20 @@ class Client {
   }
 
   /**
+   * Get a list by ID.
+   *
+   * @param string $id
+   *   The list's id (e.g. 'nypl')
+   *
+   * @return ItemList
+   *   The ItemList object
+   */
+  public function itemList($id) {
+    $path = 'lists/' . $id;
+    return new ItemList($this->getEndPoint($path)->list, $this);
+  }
+
+  /**
    * Get a Title by ID.
    *
    * @param string $id
