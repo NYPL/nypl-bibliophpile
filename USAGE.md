@@ -19,6 +19,14 @@ You can also get the locations directly from the client with the library’s id:
 
     $locations = $client->locations('nypl');
 
+## Lists
+
+Retrieve a list by it's ID:
+
+    $list = $client->itemList('170265611');
+    echo $list->name(); // "Recommended by our librarians 4";
+
+
 ## Titles
 
 Retrieve a title by its ID (NB, the IDs are numeric, but still strings):
