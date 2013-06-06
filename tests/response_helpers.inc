@@ -357,6 +357,194 @@ $_title_copies_response = <<<'JSON'
 }
 JSON;
 
+$_list_response = <<<'JSON'
+{
+    "list": {
+        "created": "2013-05-04T23:17:52Z", 
+        "description": null, 
+        "details_url": "http://any.bibliocommons.com/list/show/169884281/170265611", 
+        "id": "170265611", 
+        "item_count": 5, 
+        "language": "en-US", 
+        "list_items": [
+            {
+                "annotation": "", 
+                "list_item_type": "title", 
+                "title": {
+                    "authors": [
+                        {
+                            "name": "Stasiuk, Andrzej"
+                        }
+                    ], 
+                    "details_url": "http://any.bibliocommons.com/item/show/19776821052", 
+                    "format": {
+                        "id": "BK", 
+                        "name": "Book"
+                    }, 
+                    "id": "19776821052", 
+                    "isbns": [
+                        "9780151012718", 
+                        "0151012717"
+                    ], 
+                    "primary_language": {
+                        "name": "English"
+                    }, 
+                    "publication_date": "2011", 
+                    "sub_title": "Travels in the Other Europe", 
+                    "title": "On the Road to Babadag"
+                }
+            }, 
+            {
+                "annotation": "", 
+                "list_item_type": "title", 
+                "title": {
+                    "authors": [
+                        {
+                            "name": "Jacobson, Howard"
+                        }
+                    ], 
+                    "details_url": "http://any.bibliocommons.com/item/show/19682219052", 
+                    "format": {
+                        "id": "BK", 
+                        "name": "Book"
+                    }, 
+                    "id": "19682219052", 
+                    "isbns": [
+                        "9781608199389", 
+                        "160819938X"
+                    ], 
+                    "primary_language": {
+                        "name": "English"
+                    }, 
+                    "publication_date": "2012", 
+                    "sub_title": "A Novel", 
+                    "title": "Zoo Time"
+                }
+            }, 
+            {
+                "annotation": "", 
+                "list_item_type": "title", 
+                "title": {
+                    "authors": [
+                        {
+                            "name": "Brill, Steven"
+                        }
+                    ], 
+                    "details_url": "http://any.bibliocommons.com/item/show/18978764052", 
+                    "format": {
+                        "id": "BK", 
+                        "name": "Book"
+                    }, 
+                    "id": "18978764052", 
+                    "isbns": [
+                        "9781451611991", 
+                        "1451611994"
+                    ], 
+                    "primary_language": {
+                        "name": "English"
+                    }, 
+                    "publication_date": "2011", 
+                    "sub_title": "Inside the Fight to Fix America's Schools", 
+                    "title": "Class Warfare"
+                }
+            }, 
+            {
+                "annotation": "", 
+                "list_item_type": "title", 
+                "title": {
+                    "authors": [
+                        {
+                            "name": "Mandanna, Sarita"
+                        }
+                    ], 
+                    "details_url": "http://any.bibliocommons.com/item/show/18793844052", 
+                    "format": {
+                        "id": "BK", 
+                        "name": "Book"
+                    }, 
+                    "id": "18793844052", 
+                    "isbns": [
+                        "9780446564106", 
+                        "0446564109"
+                    ], 
+                    "primary_language": {
+                        "name": "English"
+                    }, 
+                    "publication_date": "2011", 
+                    "sub_title": "", 
+                    "title": "Tiger Hills"
+                }
+            }, 
+            {
+                "list_item_type": "url",
+                "annotation": "Check out this cool online version of Oliver Twist.",
+                "url": {
+                    "title": "Oliver Twist by Charles Dickens.",
+                    "url": "http://www.online-literature.com/dickens/olivertwist/"
+                }
+            }
+        ], 
+        "list_type": {
+            "id": "OTHER", 
+            "name": "Other"
+        }, 
+        "name": "Recommended by our librarians 4", 
+        "updated": "2013-05-05T00:53:59Z", 
+        "user": {
+            "id": "169884281", 
+            "name": "BCD2013", 
+            "profile_url": "http://any.bibliocommons.com/collection/show/169884281"
+        }
+    }
+}
+JSON;
+
+$_list_short_response = <<<'JSON'
+{
+    "list": {
+        "created": "2013-05-04T23:17:52Z", 
+        "details_url": "http://any.bibliocommons.com/list/show/169884281/170265611", 
+        "id": "170265611", 
+        "item_count": 1, 
+        "list_items": [
+            {
+                "annotation": "", 
+                "list_item_type": "title", 
+                "title": {
+                    "authors": [
+                        {
+                            "name": "Stasiuk, Andrzej"
+                        }
+                    ], 
+                    "details_url": "http://any.bibliocommons.com/item/show/19776821052", 
+                    "format": {
+                        "id": "BK", 
+                        "name": "Book"
+                    }, 
+                    "id": "19776821052", 
+                    "isbns": [
+                        "9780151012718", 
+                        "0151012717"
+                    ], 
+                    "primary_language": {
+                        "name": "English"
+                    }, 
+                    "publication_date": "2011", 
+                    "sub_title": "Travels in the Other Europe", 
+                    "title": "On the Road to Babadag"
+                }
+            }
+        ], 
+        "name": "Recommended by our librarians 4", 
+        "updated": "2013-05-05T00:53:59Z", 
+        "user": {
+            "id": "169884281", 
+            "name": "BCD2013", 
+            "profile_url": "http://any.bibliocommons.com/collection/show/169884281"
+        }
+    }
+}
+JSON;
 $_series_response_number = <<<'JSON'
 {
     "name": "Series Title",
@@ -375,6 +563,48 @@ $_status_response = <<<'JSON'
 {
     "id": "AVAILABLE",
     "name": "Available"
+}
+JSON;
+
+$_list_type_response = <<<'JSON'
+"list_type": {
+    "id": "OTHER", 
+    "name": "Other"
+}
+JSON;
+
+$_list_item_url_response = <<<'JSON'
+{
+    "list_item_type": "url",
+    "annotation": "Check out this cool online version of Oliver Twist.",
+    "url": {
+        "title": "Oliver Twist by Charles Dickens.",
+        "url": "http://www.online-literature.com/dickens/olivertwist/"
+    }
+}
+JSON;
+
+$_list_item_title_response = <<<'JSON'
+{
+    "list_item_type": "title", 
+    "title": {
+        "id": "705528135",
+        "title": "Alice in Wonderland",
+        "format": {
+            "id": "BK",
+            "name": "Book"
+        },
+        "details_url": "http://examplepl.bibliocommons.com/item/show/705528135",
+        "authors": [
+            {
+                "name": "Carroll, Lewis"
+            }
+        ],
+        "isbns": [
+            "0375866418",
+            "9780375866418"
+        ]
+    }
 }
 JSON;
 
