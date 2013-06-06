@@ -34,5 +34,12 @@ You can also get the copies from the client with the title’s ID:
 
     $copies = $client->copies('18708779052907');
 
+## Users
+
+Retrieve a user by ID:
+
+    $user = $client->user('123456789');
+    echo $user->name(); // "fakeuser"
+
 
 
