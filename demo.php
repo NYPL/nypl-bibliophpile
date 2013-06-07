@@ -26,6 +26,9 @@ abstract class PrettyPrinter
     }
 
     protected function formatSimpleResource($resource) {
+        if ($resource === NULL) {
+            return "";
+        }
         return <<<HTML
 <ul>
     <li>ID: {$resource->id()}</li>
@@ -128,6 +131,77 @@ HTML;
 
 }
 
+class ListItemTitlePrinter extends PrettyPrinter {
+    public function prettyPrint() {
+        $title = new TitlePrinter($this->resource->item());
+        return <<<HTML
+<ul>
+    <li>Annotation: {$this->resource->annotation()}</li>
+    <li>Title: {$title->prettyPrint()}</li>
+</ul>
+HTML;
+    }
+}
+
+class ListItemUrlPrinter extends PrettyPrinter {
+    public function prettyPrint() {
+        return <<<HTML
+<ul>
+    <li>Annotation: {$this->resource->annotation()}</li>
+    <li>Title: {$this->resource->item()->title()}</li>
+    <li>URL: {$this->formatLink($this->resource->item()->url())}</li>
+</ul>
+HTML;
+    }
+}
+
+class ListPrinter extends PrettyPrinter
+{
+    protected function formatItems() {
+        $formatted = "";
+        foreach ($this->resource->items() as $item) {
+            $class = get_class($item);
+            if (get_class($item) === 'NYPL\Bibliophpile\ListItemTitle') {
+                $printitem = new ListItemTitlePrinter($item); 
+            } else {
+                $printitem = new ListItemUrlPrinter($item);                 
+            }
+            $formatted .= "<li>{$printitem->prettyPrint()}</li>";
+        }
+
+        return  "<ol>" . $formatted . "</ol>";
+    }
+
+    public function prettyPrint() {
+        $user = new UserPrinter($this->resource->user());
+        return <<<HTML
+<ul>
+    <li>ID: {$this->resource->id()}</li>
+    <li>Name: {$this->resource->name()}</li>
+    <li>Item count: {$this->resource->itemCount()}</li>
+    <li>Details: {$this->formatLink($this->resource->details())}</li>
+    <li>Created: {$this->resource->created()->format('Y-m-d')}</li>
+    <li>Updated: {$this->resource->updated()->format('Y-m-d')}</li>
+    <li>User: {$user->prettyPrint()}</li>
+    <li>Items: {$this->formatItems()}</li>
+</ul>
+HTML;
+    }
+}
+
+class UserPrinter extends PrettyPrinter
+{
+    public function prettyPrint() {
+        return <<<HTML
+<ul>
+    <li>ID: {$this->resource->id()}</li>
+    <li>Name: {$this->resource->name()}</li>
+    <li>Profile: {$this->formatLink($this->resource->profile())}</li>
+</ul>
+HTML;
+    }
+}
+
 if (isset($_POST['apikey'])) {
     $apikey = $_POST['apikey'];
     $searchtype = $_POST['searchtype'];
@@ -141,6 +215,10 @@ if (isset($_POST['apikey'])) {
         $resource = new TitlePrinter($client->title($q));
     } elseif ($searchtype === 'copies-by-id') {
         $resource = new CopiesPrinter($client->copies($q));
+    } elseif ($searchtype === 'list') {
+        $resource = new ListPrinter($client->itemList($q));
+    } elseif ($searchtype === 'user-by-id') {
+        $resource = new UserPrinter($client->user($q));
     }
 
 } else {
@@ -196,6 +274,24 @@ if (isset($_POST['apikey'])) {
                         value="copies-by-id"
                         <?php if ($searchtype==='copies-by-id') {?> checked="checked"<?php } ?>>
                     <label for="radio-title">Copies of a title by ID (ex: “18708779052907”)</label>
+                </li>
+                <li>
+                    <input
+                        id="radio-list"
+                        name="searchtype"
+                        type="radio" 
+                        value="list"
+                        <?php if ($searchtype==='list') {?> checked="checked"<?php } ?>>
+                    <label for="radio-list">List by ID (ex: “170265611”)</label>
+                </li>
+                <li>
+                    <input
+                        id="radio-user"
+                        name="searchtype"
+                        type="radio" 
+                        value="user-by-id"
+                        <?php if ($searchtype==='user-by-id') {?> checked="checked"<?php } ?>>
+                    <label for="radio-user">User by ID (ex: “169884281”)</label>
                 </li>
             </ol>
         </fieldset>
