@@ -610,3 +610,5 @@ JSON;
 
 $_bad_json = "This isn't JSON";
 
+$_bc_timeout_Response = "<h1>504 Gateway Timeout</h1>"
+
