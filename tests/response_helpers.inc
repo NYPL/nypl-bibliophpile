@@ -42,91 +42,28 @@ $_users_by_id_response = <<<'JSON'
 }
 JSON;
 
-// https://api.bibliocommons.com/v1/lists?api_key=...
 $_lists_response = <<<'JSON'
 {
-    "count": 4,
-    "limit": 4,
-    "lists": [
-        {
-            "created": "2013-03-12T11:14:42Z",
-            "description": null,
-            "details_url": "http://any.bibliocommons.com/list/show/149422981/159567325",
-            "id": "159567325",
-            "item_count": 2,
-            "language": "en-US",
-            "list_type": {
-                "id": "TOPIC_GUIDE",
-                "name": "Topic Guide"
-            },
-            "name": "My Favorite Science and Nature Books",
-            "updated": "2013-03-12T11:16:51Z",
-            "user": {
-                "id": "149422981",
-                "name": "red_monkey_2384",
-                "profile_url": "http://any.bibliocommons.com/collection/show/149422981"
-            }
-        },
-        {
-            "created": "2012-11-12T20:26:39Z",
-            "description": null,
-            "details_url": "http://any.bibliocommons.com/list/show/137981261/138453972",
-            "id": "138453972",
-            "item_count": 14,
-            "language": "en-US",
-            "list_type": {
-                "id": "TOP_10",
-                "name": "Top 10 List"
-            },
-            "name": "My favourite vampire books",
-            "updated": "2012-11-12T20:29:51Z",
-            "user": {
-                "id": "137981261",
-                "name": "natasha47",
-                "profile_url": "http://any.bibliocommons.com/collection/show/137981261"
-            }
-        },
-        {
-            "created": "2012-11-12T19:30:02Z",
-            "description": null,
-            "details_url": "http://any.bibliocommons.com/list/show/138443571/138445620",
-            "id": "138445620",
-            "item_count": 6,
-            "language": "en-US",
-            "list_type": {
-                "id": "TOPIC_GUIDE",
-                "name": "Topic Guide"
-            },
-            "name": "My Favorite Stories",
-            "updated": "2012-11-12T19:31:11Z",
-            "user": {
-                "id": "138443571",
-                "name": "red_alligator_3792",
-                "profile_url": "http://any.bibliocommons.com/collection/show/138443571"
-            }
-        },
-        {
-            "created": "2012-11-12T19:17:06Z",
-            "description": null,
-            "details_url": "http://any.bibliocommons.com/list/show/138443571/138444072",
-            "id": "138444072",
-            "item_count": 8,
-            "language": "en-US",
-            "list_type": {
-                "id": "TOP_10",
-                "name": "Top 10 List"
-            },
-            "name": "My Favorite Fairy Tales",
-            "updated": "2012-11-12T19:25:25Z",
-            "user": {
-                "id": "138443571",
-                "name": "red_alligator_3792",
-                "profile_url": "http://any.bibliocommons.com/collection/show/138443571"
-            }
-        }
-    ],
-    "page": 1,
-    "pages": 1
+  "count": 2,
+  "limit": 10,
+  "pages": 1,
+  "page": 1,    
+  "lists": [
+    {
+      "id": "2353222",
+      "name": "Great Dog Training Resources",
+      "item_count": 3,
+      "created": "2010-12-09T19:46:20Z",
+      "updated": "2010-12-09T19:46:20Z" 
+    },
+    {
+      "id": "2326234",
+      "name": "Fun in the Snow",
+      "item_count": 12,
+      "created": "2010-09-15T15:23:15Z",
+      "updated": "2010-09-16T11:12:03Z"
+    }
+  ] 
 }
 JSON;
 
@@ -560,6 +497,8 @@ $_list_short_response = <<<'JSON'
         }
     }
 }
+
+
 JSON;
 $_series_response_number = <<<'JSON'
 {
