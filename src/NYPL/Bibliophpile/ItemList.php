@@ -7,9 +7,10 @@
 
 namespace NYPL\Bibliophpile;
 
-class ItemList extends DataResource {
+class ItemList extends ClientResource {
 
   protected $items;
+  protected $fullyInitialized;
 
   /**
    * List object constructor.
@@ -20,7 +21,12 @@ class ItemList extends DataResource {
    *   Client for future connections
    */
   public function __construct($data, $client) {
-    parent::__construct($data);
+    parent::__construct($data, $client);
+
+    $this->initialize($client);
+  }
+
+  protected function initialize($client) {
     $this->data->created
       = new \DateTime($this->data->created, new \DateTimeZone('utc'));
     $this->data->updated
@@ -47,6 +53,12 @@ class ItemList extends DataResource {
 
     if ($this->data->user !== NULL) {
       $this->data->user = new User($this->data->user, $client);
+    }
+
+    if (count($this->data->list_items) === 0) {
+      $this->fullyInitialized = FALSE;
+    } else {
+      $this->fullyInitialized = TRUE;
     }
   }
 
@@ -153,5 +165,25 @@ class ItemList extends DataResource {
    */
   public function items() {
     return $this->items;
+  }
+
+  /**
+   * Indicates whether the item list has been fully initialized.
+   *
+   * When returned as items in lists of lists, the lists themselves are partial
+   * (they don't have any items, for instance)
+   *
+   * @return boolean
+   */
+  public function isComplete() {
+    return $this->fullyInitialized;
+  }
+
+  public function getFullList() {
+    if ($this->isComplete()) {
+      return $this;
+    }
+
+    return $this->client->list($this->id());
   }
 }
