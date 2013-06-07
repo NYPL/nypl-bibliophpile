@@ -220,5 +220,30 @@ class ClientTest extends PHPUnit_Framework_TestCase
     # It should have the right name
     $this->assertEquals('fakeuser', $user->name());
   }
+
+  public function testSearchesUsersByUsername() {
+
+    global $_users_response;
+    $this->conn_stub->expects($this->any())
+      ->method('setUrl')
+      ->with($this->equalTo('https://api.bibliocommons.com/v1/users'));
+    $this->url_stub->expects($this->any())
+      ->method('setQueryVariables')
+      ->with($this->logicalAnd(
+        $this->arrayHasKey('api_key'),
+        $this->arrayHasKey('q'))
+      );
+    $this->response_stub->expects($this->any())
+      ->method('getBody')
+      ->will($this->returnValue($_users_response));
+
+    $client = new \NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
+    $users = $client->users('123456789');
+
+    # It should be a list of users
+    $this->assertInstanceOf('NYPL\Bibliophpile\Users', $users);
+    $userlist = $users->users();
+    $this->assertInstanceOf('NYPL\Bibliophpile\User', $userlist[0]);
+  }
 }
 

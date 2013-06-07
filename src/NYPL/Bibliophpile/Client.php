@@ -196,6 +196,24 @@ class Client {
   }
 
   /**
+   * Query users by username.
+   *
+   * Currently, this endpoint only looks for exact matches and returns 0 or 1
+   * result. The form of the response however indicates the possibility of 
+   * substring searches with multiple results.
+   *
+   * @param string $q
+   *   The string to search
+   *
+   * @return User
+   *   The User object
+   */
+  public function users($q) {
+    $path = 'users';
+    return new Users($this->getEndPoint($path, array('q' => $q)), $this);
+  }
+
+  /**
    * Get a User by ID.
    *
    * @param string $id
