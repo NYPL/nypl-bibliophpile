@@ -7,7 +7,7 @@
 require 'vendor/autoload.php';
 include_once 'response_helpers.inc';
 
-class UserTest extends PHPUnit_Framework_TestCase {
+class UsersTest extends PHPUnit_Framework_TestCase {
 
   protected $connStub;
   protected $responseStub;
