@@ -227,5 +227,9 @@ class Client {
     return new User($this->getEndPoint($path)->user, $this);
   }
 
+  public function userLists($id) {
+    $path = 'users/' . $id . '/lists';
+    return new ItemLists($this->getEndPoint($path), $this);
+  }
 
 }
