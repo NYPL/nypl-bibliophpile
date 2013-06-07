@@ -148,4 +148,8 @@ class ListTest extends PHPUnit_Framework_TestCase {
       'http://www.online-literature.com/dickens/olivertwist/', 
       $items[4]->item()->url());
   }
+
+  public function testListIsFullyInitialized() {
+    $this->assertTrue($this->list->isComplete());
+  }
 }

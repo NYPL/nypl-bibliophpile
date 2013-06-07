@@ -78,4 +78,12 @@ class ItemListsTest extends PHPUnit_Framework_TestCase {
     $lists = $this->lists->lists();
     $this->assertInstanceOf('NYPL\Bibliophpile\ItemList', $lists[0]);
   }
+
+  /**
+   * Lists that are items in lists of lists are only partial.
+   */
+  public function testListsArePartial() {
+    $lists = $this->lists->lists();
+    $this->assertFalse($lists[0]->isComplete());
+  }
 }
