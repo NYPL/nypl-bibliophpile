@@ -192,6 +192,9 @@ HTML;
 class UserPrinter extends PrettyPrinter
 {
     public function prettyPrint() {
+        if ($this->resource === NULL) {
+            return "";
+        }
         return <<<HTML
 <ul>
     <li>ID: {$this->resource->id()}</li>
@@ -227,6 +230,31 @@ HTML;
     }
 }
 
+class UserListsPrinter extends PrettyPrinter
+{
+    protected function formatLists() {
+        $formatted = "";
+        foreach ($this->resource->lists() as $list) {
+            $listprinter = new ListPrinter($list);
+            $formatted .= "<li>{$listprinter->prettyPrint()}</li>";
+        }
+
+        return  "<ol>" . $formatted . "</ol>";
+    }
+
+    public function prettyPrint() {
+        return <<<HTML
+<ul>
+    <li>Count: {$this->resource->count()}</li>
+    <li>Limit: {$this->resource->limit()}</li>
+    <li>Page: {$this->resource->page()}</li>
+    <li>Pages: {$this->resource->pages()}</li>
+    <li>Lists: {$this->formatLists()}</li>
+</ul>
+HTML;
+    }
+}
+
 if (isset($_POST['apikey'])) {
     $apikey = $_POST['apikey'];
     $searchtype = $_POST['searchtype'];
@@ -246,6 +274,8 @@ if (isset($_POST['apikey'])) {
         $resource = new UserPrinter($client->user($q));
     } elseif ($searchtype === 'user-by-name') {
         $resource = new UsersPrinter($client->users($q));
+    } elseif ($searchtype === 'lists-by-user') {
+        $resource = new UserListsPrinter($client->userLists($q));
     }
 
 } else {
@@ -328,6 +358,15 @@ if (isset($_POST['apikey'])) {
                         value="user-by-name"
                         <?php if ($searchtype==='user-by-name') {?> checked="checked"<?php } ?>>
                     <label for="radio-username">Search users by username (ex: “BCD2013”)</label>
+                </li>
+                <li>
+                    <input
+                        id="radio-userlists"
+                        name="searchtype"
+                        type="radio" 
+                        value="lists-by-user"
+                        <?php if ($searchtype==='lists-by-user') {?> checked="checked"<?php } ?>>
+                    <label for="radio-userlists">Lists for a user (ex: “169884281”)</label>
                 </li>
             </ol>
         </fieldset>
