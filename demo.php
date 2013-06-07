@@ -202,6 +202,31 @@ HTML;
     }
 }
 
+class UsersPrinter extends PrettyPrinter
+{
+    protected function formatUsers() {
+        $formatted = "";
+        foreach ($this->resource->users() as $user) {
+            $userprinter = new UserPrinter($user);
+            $formatted .= "<li>{$userprinter->prettyPrint()}</li>";
+        }
+
+        return  "<ol>" . $formatted . "</ol>";
+    }
+
+    public function prettyPrint() {
+        return <<<HTML
+<ul>
+    <li>Count: {$this->resource->count()}</li>
+    <li>Limit: {$this->resource->limit()}</li>
+    <li>Page: {$this->resource->page()}</li>
+    <li>Pages: {$this->resource->pages()}</li>
+    <li>Users: {$this->formatUsers()}</li>
+</ul>
+HTML;
+    }
+}
+
 if (isset($_POST['apikey'])) {
     $apikey = $_POST['apikey'];
     $searchtype = $_POST['searchtype'];
@@ -219,6 +244,8 @@ if (isset($_POST['apikey'])) {
         $resource = new ListPrinter($client->itemList($q));
     } elseif ($searchtype === 'user-by-id') {
         $resource = new UserPrinter($client->user($q));
+    } elseif ($searchtype === 'user-by-name') {
+        $resource = new UsersPrinter($client->users($q));
     }
 
 } else {
@@ -292,6 +319,15 @@ if (isset($_POST['apikey'])) {
                         value="user-by-id"
                         <?php if ($searchtype==='user-by-id') {?> checked="checked"<?php } ?>>
                     <label for="radio-user">User by ID (ex: “169884281”)</label>
+                </li>
+                <li>
+                    <input
+                        id="radio-username"
+                        name="searchtype"
+                        type="radio" 
+                        value="user-by-name"
+                        <?php if ($searchtype==='user-by-name') {?> checked="checked"<?php } ?>>
+                    <label for="radio-username">Search users by username (ex: “BCD2013”)</label>
                 </li>
             </ol>
         </fieldset>
