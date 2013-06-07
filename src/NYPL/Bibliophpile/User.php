@@ -38,4 +38,8 @@ class User extends ClientResource {
   public function profile() {
     return $this->data->profile_url;
   }
+
+  public function lists() {
+    return $this->client->userLists($this->id());
+  }
 }
