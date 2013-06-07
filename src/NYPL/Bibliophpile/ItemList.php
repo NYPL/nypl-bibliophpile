@@ -25,7 +25,7 @@ class ItemList extends DataResource {
       = new \DateTime($this->data->created, new \DateTimeZone('utc'));
     $this->data->updated
       = new \DateTime($this->data->updated, new \DateTimeZone('utc'));
-    $this->data->user = new User($this->data->user, $client);
+    // $this->data->user = new User($this->data->user, $client);
 
     $this->initOptionalProperties();
 
@@ -42,6 +42,12 @@ class ItemList extends DataResource {
    */
   protected function initOptionalProperties() {
     $this->initOptionalProperty('list_type', 'object');
+    $this->initOptionalProperty('user', 'object');
+    $this->initOptionalProperty('list_items', 'array', array());
+
+    if ($this->data->user !== NULL) {
+      $this->data->user = new User($this->data->user, $client);
+    }
   }
 
   /**
