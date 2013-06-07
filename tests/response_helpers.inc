@@ -499,6 +499,22 @@ $_list_response = <<<'JSON'
 }
 JSON;
 
+$_users_response = <<<'JSON'
+{
+  "count": 1,
+  "limit": 1,
+  "pages": 1,
+  "page": 1,    
+  "users": [
+    {
+      "id": "2412321",
+      "name": "exampleuser",
+      "profile_url": "http://examplepl.bibliocommons.com/collection/show/2412321"
+    }
+  ] 
+}
+JSON;
+
 $_list_short_response = <<<'JSON'
 {
     "list": {
@@ -610,5 +626,5 @@ JSON;
 
 $_bad_json = "This isn't JSON";
 
-$_bc_timeout_Response = "<h1>504 Gateway Timeout</h1>"
+$_bc_timeout_Response = "<h1>504 Gateway Timeout</h1>";
 
