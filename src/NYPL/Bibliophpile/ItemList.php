@@ -27,7 +27,7 @@ class ItemList extends DataResource {
       = new \DateTime($this->data->updated, new \DateTimeZone('utc'));
     // $this->data->user = new User($this->data->user, $client);
 
-    $this->initOptionalProperties();
+    $this->initOptionalProperties($client);
 
     if ($this->data->list_type !== NULL) {
       $this->data->list_type = new ListType($this->data->list_type);
@@ -40,7 +40,7 @@ class ItemList extends DataResource {
   /**
    * Initialize optional properties.
    */
-  protected function initOptionalProperties() {
+  protected function initOptionalProperties($client) {
     $this->initOptionalProperty('list_type', 'object');
     $this->initOptionalProperty('user', 'object');
     $this->initOptionalProperty('list_items', 'array', array());
