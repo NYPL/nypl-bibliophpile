@@ -208,12 +208,22 @@ class Client {
    * @return User
    *   The User object
    */
-  public function users($q, $page=1, $limit=10, $asObject=TRUE) {
+  public function users($q, $page = 1, $limit = 10, $as_object = TRUE) {
     $path = 'users';
-    if ($asObject === TRUE) {
-      return new Users($this->getEndPoint($path, array('q' => $q, 'page' => $page, 'limit' => $limit)), $this, $q);
+    if ($as_object === TRUE) {
+      return new Users($this->getEndPoint($path,
+        array(
+          'q' => $q,
+          'page' => $page,
+          'limit' => $limit,
+        )), $this, $q);
     }
-    return $this->getEndPoint($path, array('q' => $q, 'page' => $page, 'limit' => $limit));
+    return $this->getEndPoint($path,
+      array(
+        'q' => $q,
+        'page' => $page,
+        'limit' => $limit,
+      ));
   }
 
   /**
@@ -235,18 +245,22 @@ class Client {
    *
    * @param string $id
    *   The users's id
-   * @param integer $page
+   * @param int $page
    *   The desired page from the paginated response
-   * @param integer $limit
+   * @param int $limit
    *   The desired items per page in the paginated response
    *
    * @return User
    *   The User object
    */
-  public function userLists($id, $page=1, $limit=10, $asObject=TRUE) {
+  public function userLists($id, $page = 1, $limit = 10, $as_object = TRUE) {
     $path = 'users/' . $id . '/lists';
-    if ($asObject === TRUE) {
-      return new ItemLists($this->getEndPoint($path, array('page' => $page, 'limit' => $limit)), $this, $id);
+    if ($as_object === TRUE) {
+      return new ItemLists($this->getEndPoint($path,
+        array(
+          'page' => $page,
+          'limit' => $limit,
+        )), $this, $id);
     }
 
     return $this->getEndPoint($path, array('page' => $page, 'limit' => $limit));

@@ -39,6 +39,12 @@ class User extends ClientResource {
     return $this->data->profile_url;
   }
 
+  /**
+   * Fetch the user's lists.
+   *
+   * @return UserLists
+   *   The URL
+   */
   public function lists() {
     return $this->client->userLists($this->id());
   }

@@ -61,7 +61,7 @@ class Title extends ClientResource {
   }
 
   /**
-   * Flatten lists of single-property objects
+   * Flatten lists of single-property objects.
    */
   protected function initSingleProperties() {
     $this->data->authors
@@ -80,13 +80,13 @@ class Title extends ClientResource {
 
   /**
    * Convert series in objects of proper class.
-   */ 
+   */
   protected function initSeries() {
-    $seriesObjects = array();
+    $series_objects = array();
     foreach ($this->data->series as $s) {
-      $seriesObjects[] = new Series($s);
+      $series_objects[] = new Series($s);
     }
-    $this->data->series = $seriesObjects;
+    $this->data->series = $series_objects;
   }
 
   /**
@@ -225,7 +225,7 @@ class Title extends ClientResource {
   /**
    * Returns the title's pages.
    *
-   * @return integer
+   * @return int
    *   The pages
    */
   public function pages() {
@@ -260,7 +260,7 @@ class Title extends ClientResource {
    */
   public function primaryLanguage() {
     if ($this->data->primary_language === NULL) {
-      return NULL;      
+      return NULL;
     }
     return $this->data->primary_language->name;
   }
@@ -335,6 +335,15 @@ class Title extends ClientResource {
     return $this->data->physical_description;
   }
 
+  /**
+   * Returns the title's copies.
+   *
+   * Each title may have multiple copies in different locations. The copies 
+   * themseleves have finer-grained availability information.
+   *
+   * @return array
+   *   The Copies
+   */
   public function copies() {
     if ($this->copies === NULL) {
       $this->copies = $this->client->copies($this->data->id);
