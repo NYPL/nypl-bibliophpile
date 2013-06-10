@@ -40,14 +40,14 @@ class ItemListsTest extends PHPUnit_Framework_TestCase {
    * Every List of lists has a count.
    */
   public function testHasCount() {
-    $this->assertEquals(2, $this->lists->count());
+    $this->assertEquals(13, $this->lists->count());
   }
 
   /**
    * Every List of lists has a limit.
    */
   public function testHasLimit() {
-    $this->assertEquals(10, $this->lists->limit());
+    $this->assertEquals(2, $this->lists->limit());
   }
 
   /**
@@ -61,7 +61,7 @@ class ItemListsTest extends PHPUnit_Framework_TestCase {
    * Every List of lists has a page count.
    */
   public function testHasPages() {
-    $this->assertEquals(1, $this->lists->pages());
+    $this->assertEquals(7, $this->lists->pages());
   }
 
   /**

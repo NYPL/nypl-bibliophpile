@@ -245,5 +245,30 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $userlist = $users->users();
     $this->assertInstanceOf('NYPL\Bibliophpile\User', $userlist[0]);
   }
+
+  public function testRetrievesUsersLists() {
+    global $_lists_response;
+    $this->conn_stub->expects($this->any())
+      ->method('setUrl')
+      ->with($this->equalTo('https://api.bibliocommons.com/v1/users/123456789/lists'));
+    $this->url_stub->expects($this->any())
+      ->method('setQueryVariables')
+      ->with($this->logicalAnd(
+        $this->arrayHasKey('api_key'),
+        $this->arrayHasKey('page'),
+        $this->arrayHasKey('limit'))
+      );
+    $this->response_stub->expects($this->any())
+      ->method('getBody')
+      ->will($this->returnValue($_lists_response));
+
+    $client = new \NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
+    $lists = $client->userLists('123456789');
+
+    # It should be a list of users
+    $this->assertInstanceOf('NYPL\Bibliophpile\ItemLists', $lists);
+    $listsarray = $lists->lists();
+    $this->assertInstanceOf('NYPL\Bibliophpile\ItemList', $listsarray[0]);
+  }
 }
 

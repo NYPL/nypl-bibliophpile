@@ -44,26 +44,104 @@ JSON;
 
 $_lists_response = <<<'JSON'
 {
-  "count": 2,
-  "limit": 10,
-  "pages": 1,
-  "page": 1,    
-  "lists": [
-    {
-      "id": "2353222",
-      "name": "Great Dog Training Resources",
-      "item_count": 3,
-      "created": "2010-12-09T19:46:20Z",
-      "updated": "2010-12-09T19:46:20Z" 
-    },
-    {
-      "id": "2326234",
-      "name": "Fun in the Snow",
-      "item_count": 12,
-      "created": "2010-09-15T15:23:15Z",
-      "updated": "2010-09-16T11:12:03Z"
-    }
-  ] 
+    "count": 13,
+    "limit": 2,
+    "lists": [
+        {
+            "created": "2013-06-04T17:46:34Z",
+            "description": null,
+            "details_url": "http://any.bibliocommons.com/list/show/169884281/176809673",
+            "id": "176809673",
+            "item_count": 32,
+            "language": "en-US",
+            "list_type": {
+                "id": "OTHER",
+                "name": "Other"
+            },
+            "name": "Recently arrived eBooks 3",
+            "updated": "2013-06-04T18:05:08Z"
+        },
+        {
+            "created": "2013-06-04T17:33:32Z",
+            "description": "Recently arrived eBooks from Macmillan",
+            "details_url": "http://any.bibliocommons.com/list/show/169884281/176804995",
+            "id": "176804995",
+            "item_count": 32,
+            "language": "en-US",
+            "list_type": {
+                "id": "OTHER",
+                "name": "Other"
+            },
+            "name": "Recently arrived eBooks 2",
+            "updated": "2013-06-04T19:26:16Z"
+        }
+    ],
+    "page": 1,
+    "pages": 7
+}
+JSON;
+
+$_lists_response_p2 = <<<'JSON'
+{
+    "count": 13,
+    "limit": 2,
+    "lists": [
+        {
+            "created": "2013-06-04T17:06:47Z",
+            "description": "Recently arrived eBooks published by Hachette",
+            "details_url": "http://any.bibliocommons.com/list/show/169884281/176796343",
+            "id": "176796343",
+            "item_count": 32,
+            "language": "en-US",
+            "list_type": {
+                "id": "OTHER",
+                "name": "Other"
+            },
+            "name": "Recently arrived eBooks",
+            "updated": "2013-06-04T17:30:35Z"
+        },
+        {
+            "created": "2013-05-05T23:46:27Z",
+            "description": null,
+            "details_url": "http://any.bibliocommons.com/list/show/169884281/170407471",
+            "id": "170407471",
+            "item_count": 32,
+            "language": "en-US",
+            "list_type": {
+                "id": "OTHER",
+                "name": "Other"
+            },
+            "name": "Recently arrived 3",
+            "updated": "2013-05-06T01:26:32Z"
+        }
+    ],
+    "page": 2,
+    "pages": 7
+}
+JSON;
+
+$_lists_response_p7 = <<<'JSON'
+{
+    "count": 13,
+    "limit": 2,
+    "lists": [
+        {
+            "created": "2013-05-02T20:45:30Z",
+            "description": null,
+            "details_url": "http://any.bibliocommons.com/list/show/169884281/169886331",
+            "id": "169886331",
+            "item_count": 32,
+            "language": "en-US",
+            "list_type": {
+                "id": "OTHER",
+                "name": "Other"
+            },
+            "name": "Recommended by our librarians",
+            "updated": "2013-05-04T23:16:50Z"
+        }
+    ],
+    "page": 7,
+    "pages": 7
 }
 JSON;
 
