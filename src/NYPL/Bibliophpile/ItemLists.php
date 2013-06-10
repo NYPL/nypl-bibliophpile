@@ -31,14 +31,6 @@ class ItemLists extends PaginatedResource {
     return $this->data->lists;
   }
 
-  public function next() {
-    try {
-      return $this->gotoPage($this->page() + 1);
-    } catch (NoSuchPageException $e) {
-      throw new EndOfResultsException;
-    }
-  }
-
   public function gotoPage($page) {
     if ($page > $this->pages() || $page < 1) {
       throw new NoSuchPageException();

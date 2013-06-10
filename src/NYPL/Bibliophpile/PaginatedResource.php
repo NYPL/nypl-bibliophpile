@@ -26,6 +26,7 @@ abstract class PaginatedResource extends ClientResource {
   }
 
   abstract protected function initItems();
+  abstract public function gotoPage($page);
 
   /**
    * Returns the number of items in the resource.
@@ -65,5 +66,13 @@ abstract class PaginatedResource extends ClientResource {
    */
   public function page() {
     return $this->data->page;
+  }
+
+  public function next() {
+    try {
+      return $this->gotoPage($this->page() + 1);
+    } catch (NoSuchPageException $e) {
+      throw new EndOfResultsException;
+    }
   }
 }
