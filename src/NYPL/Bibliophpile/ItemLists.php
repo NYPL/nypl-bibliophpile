@@ -32,15 +32,11 @@ class ItemLists extends PaginatedResource {
   }
 
   public function next() {
-    if ($this->page() + 1 > $this->pages()) {
-      throw new EndOfResultsException();
+    try {
+      return $this->gotoPage($this->page() + 1);
+    } catch (NoSuchPageException $e) {
+      throw new EndOfResultsException;
     }
-
-    $data = $this->client()->userLists($this->userid, $this->page() + 1, $this->limit(), FALSE);
-
-    $this->data = $data;
-    $this->initItems();
-    return $this->lists();
   }
 
   public function gotoPage($page) {
