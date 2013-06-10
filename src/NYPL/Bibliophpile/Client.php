@@ -208,9 +208,12 @@ class Client {
    * @return User
    *   The User object
    */
-  public function users($q) {
+  public function users($q, $page=1, $limit=10, $asObject=TRUE) {
     $path = 'users';
-    return new Users($this->getEndPoint($path, array('q' => $q)), $this, $q);
+    if ($asObject === TRUE) {
+      return new Users($this->getEndPoint($path, array('q' => $q, 'page' => $page, 'limit' => $limit)), $this, $q);
+    }
+    return $this->getEndPoint($path, array('q' => $q, 'page' => $page, 'limit' => $limit));
   }
 
   /**

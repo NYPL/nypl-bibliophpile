@@ -40,6 +40,6 @@ class Users extends PaginatedResource {
 
     $this->data = $data;
     $this->initItems();
-    return $this->lists();
+    return $this->users();
   }
 }
