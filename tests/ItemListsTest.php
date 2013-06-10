@@ -130,4 +130,27 @@ class ItemListsTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals(2, $this->lists->page());
 
   }
+
+  public function testCanGetSpecificPage() {
+    global $_lists_response_p7;
+    $this->connStub->expects($this->any())
+      ->method('setUrl')
+      ->with($this->equalTo('https://api.bibliocommons.com/v1/users/123456789/lists'));
+    $this->urlStub->expects($this->any())
+      ->method('setQueryVariables')
+      ->with($this->logicalAnd(
+        $this->arrayHasKey('api_key'),
+        $this->arrayHasKey('page'),
+        $this->arrayHasKey('limit'))
+      );
+    $this->responseStub->expects($this->any())
+      ->method('getBody')
+      ->will($this->returnValue($_lists_response_p7));
+
+    $page = $this->lists->gotoPage(7);
+
+    $this->assertInternalType('array', $page);
+    $this->assertInstanceOf('NYPL\Bibliophpile\ItemList', $page[0]);
+    $this->assertEquals(7, $this->lists->page());
+  }
 }
