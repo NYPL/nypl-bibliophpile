@@ -118,4 +118,24 @@ class UsersTest extends PHPUnit_Framework_TestCase {
     $this->assertEquals(1, $this->users->page());
   }
 
+  /**
+   * @expectedException \NYPL\Bibliophpile\NoSuchPageException
+   */
+  public function testRaisesExceptionForPageTooHigh() {
+    $this->users->gotoPage(99);
+  }
+
+  /**
+   * @expectedException \NYPL\Bibliophpile\NoSuchPageException
+   */
+  public function testRaisesExceptionForPageTooLow() {
+    $this->users->gotoPage(0);
+  }
+
+  /**
+   * @expectedException \NYPL\Bibliophpile\EndOfResultsException
+   */
+  public function testWillNotGoPastLastPage() {
+    $this->users->next();
+  }
 }
