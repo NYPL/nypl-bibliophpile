@@ -26,12 +26,14 @@ class ItemList extends ClientResource {
     $this->initialize($client);
   }
 
+  /**
+   * Initialize object data.
+   */
   protected function initialize($client) {
     $this->data->created
       = new \DateTime($this->data->created, new \DateTimeZone('utc'));
     $this->data->updated
       = new \DateTime($this->data->updated, new \DateTimeZone('utc'));
-    // $this->data->user = new User($this->data->user, $client);
 
     $this->initOptionalProperties($client);
 
@@ -57,7 +59,8 @@ class ItemList extends ClientResource {
 
     if (count($this->data->list_items) === 0) {
       $this->fullyInitialized = FALSE;
-    } else {
+    }
+    else {
       $this->fullyInitialized = TRUE;
     }
   }
@@ -173,12 +176,23 @@ class ItemList extends ClientResource {
    * When returned as items in lists of lists, the lists themselves are partial
    * (they don't have any items, for instance)
    *
-   * @return boolean
+   * @return bool
+   *   True if the object has been fully initialized
    */
   public function isComplete() {
     return $this->fullyInitialized;
   }
 
+  /**
+   * Retrieve the full version of the ItemList.
+   *
+   * When returned as items in lists of lists, the lists themselves are partial
+   * (they don't have any items, for instance). This method return the full
+   * ItemList as a separate object.
+   *
+   * @return ItemList
+   *   True fully initialized ItemList
+   */
   public function getFullList() {
     if ($this->isComplete()) {
       return $this;
