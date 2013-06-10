@@ -227,9 +227,22 @@ class Client {
     return new User($this->getEndPoint($path)->user, $this);
   }
 
-  public function userLists($id) {
+  /**
+   * Get a User's lists by ID.
+   *
+   * @param string $id
+   *   The users's id
+   * @param integer $page
+   *   The desired page from the paginated response
+   * @param integer $limit
+   *   The desired items per page in the paginated response
+   *
+   * @return User
+   *   The User object
+   */
+  public function userLists($id, $page=1, $limit=10) {
     $path = 'users/' . $id . '/lists';
-    return new ItemLists($this->getEndPoint($path), $this);
+    return new ItemLists($this->getEndPoint($path, array('page' => $page, 'limit' => $limit)), $this);
   }
 
 }
