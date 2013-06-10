@@ -26,7 +26,8 @@ class UsersTest extends PHPUnit_Framework_TestCase {
       = new NYPL\Bibliophpile\Client('abcdef', $this->connStub);
     $this->users = new NYPL\Bibliophpile\Users(
       json_decode($_users_response),
-      $this->client);
+      $this->client,
+      'xyz');
   }
 
   /**

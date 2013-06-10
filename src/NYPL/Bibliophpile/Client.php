@@ -210,7 +210,7 @@ class Client {
    */
   public function users($q) {
     $path = 'users';
-    return new Users($this->getEndPoint($path, array('q' => $q)), $this);
+    return new Users($this->getEndPoint($path, array('q' => $q)), $this, $q);
   }
 
   /**
