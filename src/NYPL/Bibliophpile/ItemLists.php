@@ -44,7 +44,7 @@ class ItemLists extends PaginatedResource {
   }
 
   public function gotoPage($page) {
-    if ($page > $this->pages()) {
+    if ($page > $this->pages() || $page < 1) {
       throw new NoSuchPageException();
     }
 

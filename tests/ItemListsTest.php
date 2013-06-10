@@ -153,4 +153,31 @@ class ItemListsTest extends PHPUnit_Framework_TestCase {
     $this->assertInstanceOf('NYPL\Bibliophpile\ItemList', $page[0]);
     $this->assertEquals(7, $this->lists->page());
   }
+
+  /**
+   * @expectedException \NYPL\Bibliophpile\NoSuchPageException
+   */
+  public function testRaisesExceptionForPageTooHigh() {
+    $this->lists->gotoPage(99);
+  }
+
+  /**
+   * @expectedException \NYPL\Bibliophpile\NoSuchPageException
+   */
+  public function testRaisesExceptionForPageTooLow() {
+    $this->lists->gotoPage(0);
+  }
+
+  /**
+   * @expectedException \NYPL\Bibliophpile\EndofResultsException
+   */
+  public function testWillNotGoPastLastPage() {
+    global $_lists_response_p7;
+    $this->responseStub->expects($this->any())
+      ->method('getBody')
+      ->will($this->returnValue($_lists_response_p7));
+
+    $page = $this->lists->gotoPage(7);
+    $this->lists->next();
+  }
 }
