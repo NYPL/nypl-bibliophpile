@@ -52,7 +52,7 @@ class DataResource {
    *   Value to be returned if the property is null, empty, or missing.
    */
   protected function initOptionalProperty($value, $class, $null_value = NULL) {
-    if (!property_exists($this->data, $value)) {
+    if (!property_exists($this->data, $value) || $this->data->$value === NULL) {
       $this->data->$value = $null_value;
       return;
     }

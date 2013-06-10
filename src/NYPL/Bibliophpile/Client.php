@@ -195,6 +195,22 @@ class Client {
     return $copies;
   }
 
+  public function titles($q, $library, $search_type = 'keyword', $page = 1, $limit = 10, $as_object = TRUE) {
+    $path = 'titles';
+    $result = $this->getEndPoint($path,
+      array(
+        'q' => $q,
+        'library' => $library,
+        'search_type' => $search_type,
+        'page' => $page,
+        'limit' => $limit,
+      ));
+    if ($as_object === TRUE) {
+      return new Titles($result, $this, $q, $library, $search_type);
+    }
+    return $result;
+  }
+
   /**
    * Query users by username.
    *

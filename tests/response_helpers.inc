@@ -372,6 +372,186 @@ $_title_copies_response = <<<'JSON'
 }
 JSON;
 
+// https://api.bibliocommons.com/v1/titles?api_key=...&q=Moby+Dick&library=nypl&limit=2
+$_titles_search_response = <<<'JSON'
+{
+    "count": 412,
+    "limit": 2,
+    "page": 1,
+    "pages": 206,
+    "titles": [
+        {
+            "authors": [
+                {
+                    "name": "Melville, Herman"
+                }
+            ],
+            "availability": {
+                "id": "AVAILABLE",
+                "name": "Available to borrow"
+            },
+            "details_url": "http://nypl.bibliocommons.com/item/show/18708779052907",
+            "format": {
+                "id": "PAPERBACK",
+                "name": "Paperback"
+            },
+            "id": "18708779052907",
+            "isbns": [
+                "0553213113",
+                "9780553213119"
+            ],
+            "primary_language": {
+                "name": "English"
+            },
+            "publication_date": "2003",
+            "sub_title": "",
+            "title": "Moby-Dick"
+        },
+        {
+            "authors": [
+                {
+                    "name": "Melville, Herman"
+                }
+            ],
+            "availability": {
+                "id": "AVAILABLE",
+                "name": "Available to borrow"
+            },
+            "details_url": "http://nypl.bibliocommons.com/item/show/17230484052907",
+            "format": {
+                "id": "BK",
+                "name": "Book"
+            },
+            "id": "17230484052907",
+            "primary_language": {
+                "name": "English"
+            },
+            "publication_date": "1981",
+            "sub_title": "",
+            "title": "Moby-Dick"
+        }
+    ]
+}
+JSON;
+
+$_titles_search_response_p2 = <<<'JSON'
+{
+    "count": 412,
+    "limit": 2,
+    "page": 2,
+    "pages": 206,
+    "titles": [
+        {
+            "authors": [
+                {
+                    "name": "Melville, Herman"
+                }
+            ],
+            "availability": null,
+            "details_url": "http://nypl.bibliocommons.com/item/show/19655776052907",
+            "format": {
+                "id": "EBOOK",
+                "name": "eBook"
+            },
+            "id": "19655776052907",
+            "isbns": [
+                "9781620117002",
+                "1620117002"
+            ],
+            "primary_language": {
+                "name": "English"
+            },
+            "publication_date": "2012",
+            "sub_title": "Or, The Whale",
+            "title": "Moby Dick"
+        },
+        {
+            "authors": [
+                {
+                    "name": "Kimmel, Eric A."
+                }
+            ],
+            "availability": {
+                "id": "AVAILABLE",
+                "name": "Available to borrow"
+            },
+            "details_url": "http://nypl.bibliocommons.com/item/show/19668330052907",
+            "format": {
+                "id": "BK",
+                "name": "Book"
+            },
+            "id": "19668330052907",
+            "isbns": [
+                "9780312662974",
+                "0312662971"
+            ],
+            "primary_language": {
+                "name": "English"
+            },
+            "publication_date": "2012",
+            "sub_title": "Chasing the Great White Whale",
+            "title": "Moby Dick"
+        }
+    ]
+}
+JSON;
+
+$_titles_search_response_p206 = <<<'JSON'
+{
+    "count": 412,
+    "limit": 2,
+    "page": 206,
+    "pages": 206,
+    "titles": [
+        {
+            "authors": [],
+            "availability": {
+                "id": "LIBRARY_USE_ONLY",
+                "name": "In-library use only"
+            },
+            "details_url": "http://nypl.bibliocommons.com/item/show/16829330052907",
+            "format": {
+                "id": "BK",
+                "name": "Book"
+            },
+            "id": "16829330052907",
+            "isbns": [
+                "9780262633635",
+                "0262633639"
+            ],
+            "primary_language": {
+                "name": "English"
+            },
+            "publication_date": "2008",
+            "sub_title": "Sampling Digital Music and Culture",
+            "title": "Sound Unbound"
+        },
+        {
+            "authors": [],
+            "availability": {
+                "id": "AVAILABLE",
+                "name": "Available to borrow"
+            },
+            "details_url": "http://nypl.bibliocommons.com/item/show/17366912052907",
+            "format": {
+                "id": "BK",
+                "name": "Book"
+            },
+            "id": "17366912052907",
+            "isbns": [
+                "0262633639",
+                "9780262633635"
+            ],
+            "primary_language": {
+                "name": "English"
+            },
+            "publication_date": "2008",
+            "sub_title": "Sampling Digital Music and Culture",
+            "title": "Sound Unbound"
+        }
+    ]
+}
+JSON;
 $_list_response = <<<'JSON'
 {
     "list": {
