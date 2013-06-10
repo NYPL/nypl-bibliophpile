@@ -240,9 +240,14 @@ class Client {
    * @return User
    *   The User object
    */
-  public function userLists($id, $page=1, $limit=10) {
+  public function userLists($id, $page=1, $limit=10, $asObject=TRUE) {
     $path = 'users/' . $id . '/lists';
-    return new ItemLists($this->getEndPoint($path, array('page' => $page, 'limit' => $limit)), $this);
+    if ($asObject === TRUE) {
+      return new ItemLists($this->getEndPoint($path, array('page' => $page, 'limit' => $limit)), $this, $id);
+    }
+
+    return $this->getEndPoint($path, array('page' => $page, 'limit' => $limit));
+
   }
 
 }

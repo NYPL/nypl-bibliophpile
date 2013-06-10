@@ -10,6 +10,7 @@ include_once 'response_helpers.inc';
 class ItemListsTest extends PHPUnit_Framework_TestCase {
 
   protected $connStub;
+  protected $urlStub;
   protected $responseStub;
   protected $client;
   protected $lists;
@@ -22,11 +23,27 @@ class ItemListsTest extends PHPUnit_Framework_TestCase {
     global $_lists_response;
 
     $this->connStub = $this->getMock('HTTP_Request2');
+    $this->responseStub = $this->getMockBuilder('HTTP_Request2_Response')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->urlStub = $this->getMockBuilder('Net_URL2')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $this->connStub->expects($this->any())
+      ->method('send')
+      ->will($this->returnValue($this->responseStub));
+    $this->connStub->expects($this->any())
+      ->method('getUrl')
+      ->will($this->returnValue($this->urlStub));
+
+
     $this->client
       = new NYPL\Bibliophpile\Client('abcdef', $this->connStub);
     $this->lists = new NYPL\Bibliophpile\ItemLists(
       json_decode($_lists_response),
-      $this->client);
+      $this->client,
+      '123456789');
   }
 
   /**
@@ -85,5 +102,32 @@ class ItemListsTest extends PHPUnit_Framework_TestCase {
   public function testListsArePartial() {
     $lists = $this->lists->lists();
     $this->assertFalse($lists[0]->isComplete());
+  }
+
+  /**
+   * ItemLists are paginated, so there should be a next page of lists
+   */
+  public function testCanGetNextPage() {
+    global $_lists_response_p2;
+    $this->connStub->expects($this->any())
+      ->method('setUrl')
+      ->with($this->equalTo('https://api.bibliocommons.com/v1/users/123456789/lists'));
+    $this->urlStub->expects($this->any())
+      ->method('setQueryVariables')
+      ->with($this->logicalAnd(
+        $this->arrayHasKey('api_key'),
+        $this->arrayHasKey('page'),
+        $this->arrayHasKey('limit'))
+      );
+    $this->responseStub->expects($this->any())
+      ->method('getBody')
+      ->will($this->returnValue($_lists_response_p2));
+
+    $next = $this->lists->next();
+
+    $this->assertInternalType('array', $next);
+    $this->assertInstanceOf('NYPL\Bibliophpile\ItemList', $next[0]);
+    $this->assertEquals(2, $this->lists->page());
+
   }
 }
