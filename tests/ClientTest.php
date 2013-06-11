@@ -270,5 +270,51 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $listsarray = $lists->lists();
     $this->assertInstanceOf('NYPL\Bibliophpile\ItemList', $listsarray[0]);
   }
+
+  public function testRetrievesSessions() {
+
+    global $_session_response;
+    $this->conn_stub->expects($this->any())
+      ->method('setUrl')
+      ->with($this->equalTo('https://api.bibliocommons.com/v1/sessions/123456789'));
+    $this->url_stub->expects($this->any())
+      ->method('setQueryVariables')
+      ->with($this->arrayHasKey('api_key'));
+    $this->response_stub->expects($this->any())
+      ->method('getBody')
+      ->will($this->returnValue($_session_response));
+
+    $client = new \NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
+    $session = $client->session('123456789');
+
+    # It should be a Session
+    $this->assertInstanceOf('NYPL\Bibliophpile\Session', $session);
+
+    # It should have the right name
+    $this->assertEquals('exampleuser', $session->name());
+  }
+
+  public function testRetrievesBorrowers() {
+
+    global $_borrower_response;
+    $this->conn_stub->expects($this->any())
+      ->method('setUrl')
+      ->with($this->equalTo('https://api.bibliocommons.com/v1/libraries/nypl/borrowers/123456789'));
+    $this->url_stub->expects($this->any())
+      ->method('setQueryVariables')
+      ->with($this->arrayHasKey('api_key'));
+    $this->response_stub->expects($this->any())
+      ->method('getBody')
+      ->will($this->returnValue($_borrower_response));
+
+    $client = new \NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
+    $borrower = $client->borrower('nypl', '123456789');
+
+    # It should be a Borrower
+    $this->assertInstanceOf('NYPL\Bibliophpile\Borrower', $borrower);
+
+    # It should have the right barcode
+    $this->assertEquals('123456789012', $borrower->barcode());
+  }
 }
 

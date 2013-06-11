@@ -283,4 +283,34 @@ class Client {
 
   }
 
+  /**
+   * Get a Session by ID.
+   *
+   * @param string $id
+   *   The session id
+   *
+   * @return Session
+   *   The Session object
+   */
+  public function session($id) {
+    $path = 'sessions/' . $id;
+    return new Session($this->getEndPoint($path)->session, $this);
+  }
+
+  /**
+   * Get the borrower.
+   *
+   * @param string $library_id
+   *   The library's id (e.g. 'nypl')
+   *
+   * @param string $borrower_id
+   *   The library's id
+   *
+   * @return Borrower
+   *   The borrower
+   */
+  public function borrower($library_id, $borrower_id) {
+    $path = 'libraries/' . $library_id . '/borrowers/' . $borrower_id;
+    return new Borrower($this->getEndPoint($path)->borrower, $this);
+  }
 }
