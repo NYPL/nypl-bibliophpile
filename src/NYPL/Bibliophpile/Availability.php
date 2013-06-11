@@ -7,4 +7,9 @@
 
 namespace NYPL\Bibliophpile;
 
+/**
+ * Short Descrip.
+ * 
+ * Long description
+ */
 class Availability extends SimpleResource {}

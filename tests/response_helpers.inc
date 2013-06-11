@@ -821,6 +821,59 @@ $_list_item_title_response = <<<'JSON'
 }
 JSON;
 
+$_session_response = <<<'JSON'
+{
+  "session": {
+    "id": "2412321",
+    "name": "exampleuser",
+    "borrower_id": "123456"
+  }
+}
+JSON;
+
+$_no_session_response = <<<'JSON'
+{
+    "error": {
+        "message": "No session 'a123b4cd-5e67-8901-f234-g56h78901ij2' found.",
+        "request": "/sessions/a123b4cd-5e67-8901-f234-g56h78901ij2?api_key=12345"
+        }
+}
+JSON;
+
+$_borrower_response = <<<'JSON'
+{
+  "borrower": {
+    "id": "654321",
+    "barcode": "123456789012",
+    "library_borrower_type": "p",
+    "email": "example@example.com",
+    "first_name": "Example",
+    "last_name": "User",
+    "expiry_date": "2013-01-31T00:00:00Z",
+    "birth_date": "1973-01-01T00:00:00Z", 
+    "location": {
+      "id": "AL",
+      "name": "Anytown Library"
+    },
+    "user": {
+      "id": "987654321",
+      "name": "exampleuser",
+      "profile_url": "http://examplepl.bibliocommons.com/collection/show/987564321"
+    },
+    "interest_groups": [
+      {
+        "id": "teacher_high_school",
+        "name": "Teacher - High School"
+      },
+      {
+        "id": "writer",
+        "name": "Author/Writer/Journalist/Poet"
+      }
+    ]
+  }
+}
+JSON;
+
 $_bad_json = "This isn't JSON";
 
 $_bc_timeout_Response = "<h1>504 Gateway Timeout</h1>";

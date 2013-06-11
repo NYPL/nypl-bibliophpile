@@ -49,5 +49,11 @@ Retrieve a user by ID:
     $user = $client->user('123456789');
     echo $user->name(); // "fakeuser"
 
+Search for users by username:
+
+    $users = $client->users('fakeuser');
+    $userlist = $users->users(); // array of results
+    count($users->users()); // 1
+    echo $userlist[0]->name(); // "fakeuser"
 
 
