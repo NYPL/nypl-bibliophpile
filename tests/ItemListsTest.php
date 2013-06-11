@@ -120,6 +120,9 @@ class ItemListsTest extends PHPUnit_Framework_TestCase {
         $this->arrayHasKey('limit'))
       );
     $this->responseStub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
+    $this->responseStub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_lists_response_p2));
 
@@ -143,6 +146,9 @@ class ItemListsTest extends PHPUnit_Framework_TestCase {
         $this->arrayHasKey('page'),
         $this->arrayHasKey('limit'))
       );
+    $this->responseStub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
     $this->responseStub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_lists_response_p7));
@@ -173,6 +179,9 @@ class ItemListsTest extends PHPUnit_Framework_TestCase {
    */
   public function testWillNotGoPastLastPage() {
     global $_lists_response_p7;
+    $this->responseStub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
     $this->responseStub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_lists_response_p7));

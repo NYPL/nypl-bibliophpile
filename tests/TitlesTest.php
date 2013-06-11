@@ -108,6 +108,9 @@ class TitlesTest extends PHPUnit_Framework_TestCase {
     $this->urlStub->expects($this->any())
       ->method('setQueryVariables');
     $this->responseStub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
+    $this->responseStub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_titles_search_response_p2));
 
@@ -126,6 +129,9 @@ class TitlesTest extends PHPUnit_Framework_TestCase {
       ->with($this->equalTo('https://api.bibliocommons.com/v1/titles'));
     $this->urlStub->expects($this->any())
       ->method('setQueryVariables');
+    $this->responseStub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
     $this->responseStub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_titles_search_response_p206));
@@ -156,6 +162,9 @@ class TitlesTest extends PHPUnit_Framework_TestCase {
    */
   public function testWillNotGoPastLastPage() {
     global $_titles_search_response_p206;
+    $this->responseStub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
     $this->responseStub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_titles_search_response_p206));

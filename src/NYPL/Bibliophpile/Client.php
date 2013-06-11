@@ -106,14 +106,19 @@ class Client {
       $path));
     $this->conn->setUrl($url);
     $this->conn->getUrl()->setQueryVariables($all_params);
-    $data = $this->conn->send()->getBody();
-    $parsed = json_decode($data);
+    // $data = $this->conn->send()->getBody();
+    $response = $this->conn->send();
+    $data = $response->getBody();
+    if ($response->getStatus() === 200) {
+      $parsed = json_decode($data);
 
-    if ($parsed !== NULL) {
-      return $parsed;
+      if ($parsed !== NULL) {
+        return $parsed;
+      }
+
+      throw new JsonException('Error parsing JSON');
     }
-
-    throw new JsonException('Error parsing JSON');
+    throw new RequestException('Request failed with code ' . $response->getStatus());
   }
 
   /**

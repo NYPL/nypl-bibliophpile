@@ -57,6 +57,9 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_library_response));
+    $this->response_stub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
 
     $client = new NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
 
@@ -74,6 +77,9 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $this->conn_stub->expects($this->any())
       ->method('setUrl');
     $this->response_stub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
+    $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_bad_json));
     $client = new NYPL\Bibliophpile\Client('abcdef', $this->conn_stub);
@@ -90,6 +96,9 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $this->url_stub->expects($this->any())
       ->method('setQueryVariables')
       ->with($this->arrayHasKey('api_key'));
+    $this->response_stub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
     $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_library_response));
@@ -109,6 +118,9 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $this->conn_stub->expects($this->any())
       ->method('setUrl')
       ->with($this->equalTo('https://api.bibliocommons.com/v1/libraries/nypl/locations'));
+    $this->response_stub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
     $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_locations_response));
@@ -136,6 +148,9 @@ class ClientTest extends PHPUnit_Framework_TestCase
       ->method('setQueryVariables')
       ->with($this->arrayHasKey('api_key'));
     $this->response_stub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
+    $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_list_response));
 
@@ -159,6 +174,9 @@ class ClientTest extends PHPUnit_Framework_TestCase
       ->method('setQueryVariables')
       ->with($this->arrayHasKey('api_key'));
     $this->response_stub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
+    $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_title_response));
 
@@ -181,6 +199,9 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $this->url_stub->expects($this->any())
       ->method('setQueryVariables')
       ->with($this->arrayHasKey('api_key'));
+    $this->response_stub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
     $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_title_copies_response));
@@ -208,6 +229,9 @@ class ClientTest extends PHPUnit_Framework_TestCase
       ->method('setQueryVariables')
       ->with($this->arrayHasKey('api_key'));
     $this->response_stub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
+    $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_users_by_id_response));
 
@@ -234,6 +258,9 @@ class ClientTest extends PHPUnit_Framework_TestCase
         $this->arrayHasKey('q'))
       );
     $this->response_stub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
+    $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_users_response));
 
@@ -259,6 +286,9 @@ class ClientTest extends PHPUnit_Framework_TestCase
         $this->arrayHasKey('limit'))
       );
     $this->response_stub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
+    $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_lists_response));
 
@@ -280,6 +310,9 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $this->url_stub->expects($this->any())
       ->method('setQueryVariables')
       ->with($this->arrayHasKey('api_key'));
+    $this->response_stub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
     $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_session_response));
@@ -303,6 +336,9 @@ class ClientTest extends PHPUnit_Framework_TestCase
     $this->url_stub->expects($this->any())
       ->method('setQueryVariables')
       ->with($this->arrayHasKey('api_key'));
+    $this->response_stub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
     $this->response_stub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_borrower_response));

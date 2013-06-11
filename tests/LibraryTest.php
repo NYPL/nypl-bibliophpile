@@ -76,6 +76,9 @@ class LibraryTest extends PHPUnit_Framework_TestCase {
       ->getMock();
 
     $this->responseStub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
+    $this->responseStub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_locations_response));
 

@@ -108,6 +108,9 @@ class UsersTest extends PHPUnit_Framework_TestCase {
         $this->arrayHasKey('limit'))
       );
     $this->responseStub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
+    $this->responseStub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_users_response));
 

@@ -476,6 +476,9 @@ class TitleTest extends PHPUnit_Framework_TestCase {
       ->method('setQueryVariables')
       ->with($this->arrayHasKey('api_key'));
     $this->responseStub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
+    $this->responseStub->expects($this->any())
       ->method('getBody')
       ->will($this->returnValue($_title_copies_response));
 
@@ -509,6 +512,9 @@ class TitleTest extends PHPUnit_Framework_TestCase {
     $this->urlStub->expects($this->any())
       ->method('setQueryVariables')
       ->with($this->arrayHasKey('api_key'));
+    $this->responseStub->expects($this->any())
+      ->method('getStatus')
+      ->will($this->returnValue(200));
     $this->responseStub->expects($this->once())
       ->method('getBody')
       ->will($this->returnValue($_title_copies_response));
