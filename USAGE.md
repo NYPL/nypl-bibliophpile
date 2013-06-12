@@ -44,9 +44,15 @@ The objects themselves share the following methods:
 * `pages()`: Returns the number of pages in the results
 * `limit()`: Returns the number of items per page
 * `gotoPage(page)`: Retrieves the desired page of results.
-* next(): Retrieves the next page of results.
+* `next()`: Retrieves the next page of results.
 
-Trying to get a page that does not exist (less than 1 or higher than the highest numbered page in the results) will raise a `NoSuchPageException`. Trying to get the next page when you are already at the end of the results raises an `EndOfResultsException`. 
+Trying to get a page that does not exist (less than 1 or higher than the highest numbered page in the results) will raise a `NoSuchPageException`. Trying to get the next page when you are already at the end of the results raises an `EndOfResultsException` which can be caught and used a signal to exit a loop when fetching the entire results set. 
+
+## Empty properties
+
+Many objects returned by the BiblioCommons API can have empty, null, or missing properties. Nypl-bibliophpile handles all these cases by returning an empty array for properties that are expected to be arrays, or `NULL` for enything else.
+
+## Resources
 
 ### Libraries
 
@@ -73,6 +79,133 @@ Individual locations also occur as properties in Copy (location of a particular 
 ### Titles
 
 A “title” can be a book, a DVD, a CD, or anything that can be checked out. 
+
+Methods:
+<table>
+    <tbody>
+        <tr>
+            <td>additionalContributors()</td>
+            <td>array</td>
+            <td>Additional contributors as an array of names (strings)</td>
+        </tr>
+        <tr>
+            <td>authors()</td>
+            <td>array</td>
+            <td>Authors names as an array strings.</td>
+        </tr>
+        <tr>
+        </tr>
+        <tr>
+            <td>availability()</td>
+            <td>Availability</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>callNumber()</td>
+            <td>string</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>contents()</td>
+            <td>array</td>
+            <td>Table of contents as an array of strings.</td>
+        </tr>
+        <tr>
+            <td>copies()</td>
+            <td>array</td>
+            <td>An array of Copy objects.</td>
+        </tr>
+        <tr>
+            <td>description()</td>
+            <td>string</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>details()</td>
+            <td>string</td>
+           <td>URL for the title on BiblioCommons.</td>
+        </tr>
+        <tr>
+            <td>edition()</td>
+            <td>string</td>
+        </tr>
+        <tr>
+            <td>format()</td>
+            <td>Format</td>
+        </tr>
+        <tr>
+            <td>id()</td>
+            <td>string</td>
+        </tr>
+        <tr>
+            <td>isbns()</td>
+            <td>array</td>
+            <td>An array of the title's isbns as strings.</td>
+        </tr>
+        <tr>
+            <td>languages()</td>
+            <td>array</td>
+            <td>Array of the title's languages as strings.</td>
+        </tr>
+        <tr>
+            <td>name()</td>
+            <td>string</td>
+            <td>Returns the title's name (i.e. it's title, but this method can’t be called title() in order to avoid confusion with a constructor).</td>
+        </tr>
+        <tr>
+            <td>notes()</td>
+            <td>array</td>
+            <td>Notes on the title as an array of strings.</td>
+        </tr>
+        <tr>
+            <td>pages()</td>
+            <td>int</td>
+            <td>The number of pages</td>
+        </tr>
+        <tr>
+            <td>performers()</td>
+            <td>array</td>
+            <td>Title's performers and an array of strings.</td>
+        </tr>
+        <tr>
+            <td>physicalDescription()</td>
+            <td>array</td>
+            <td>Physical description of the title as an array of strings.</td>
+        </tr>
+        <tr>
+            <td>primaryLanguage()</td>
+            <td>string</td>
+        </tr>
+        <tr>
+            <td>publishers()</td>
+            <td>array</td>
+            <td>Array of publishers names as strings.</td>
+        </tr>
+        <tr>
+            <td>series()</td>
+            <td>array</td>
+            <td>An array of Series objects.</td>
+        </tr>
+        <tr>
+            <td>statementOfResponsibility()</td>
+            <td>string</td>
+        </tr>
+        <tr>
+            <td>subtitle()</td>
+            <td>string</td>
+        </tr>
+        <tr>
+            <td>suitabilities()</td>
+            <td>array</td>
+            <td>An array of strings.</td>
+        </tr>
+        <tr>
+            <td>upcs()</td>
+            <td>array</td>
+            <td>The title's upcs as an array of strings.</td>
+        </tr>
+    </tbody>
+</table>
 
 ## Lists
 
