@@ -61,6 +61,7 @@ class Client {
     else {
       $this->conn = $conn;
     }
+    $this->conn->setConfig(array('ssl_verify_peer' => FALSE));
   }
 
   /**
