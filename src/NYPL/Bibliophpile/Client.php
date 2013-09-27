@@ -20,7 +20,7 @@ class Client {
    *
    * @var string
    */
-  const API_BASE = 'http://api.bibliocommons.com';
+  const API_BASE = 'https://api.bibliocommons.com';
 
   /**
    * Version of the BiblioCommons API used by this library
