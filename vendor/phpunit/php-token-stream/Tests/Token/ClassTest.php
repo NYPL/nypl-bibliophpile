@@ -2,7 +2,7 @@
 /**
  * php-token-stream
  *
- * Copyright (c) 2009-2012, Sebastian Bergmann <sb@sebastian-bergmann.de>.
+ * Copyright (c) 2009-2014, Sebastian Bergmann <sebastian@phpunit.de>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,20 +37,10 @@
  * @package    PHP_TokenStream
  * @subpackage Tests
  * @author     Laurent Laville <pear@laurent-laville.org>
- * @copyright  2009-2012 Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @copyright  2009-2014 Sebastian Bergmann <sebastian@phpunit.de>
  * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
  * @since      File available since Release 1.0.2
  */
-
-if (!defined('TEST_FILES_PATH')) {
-    define(
-      'TEST_FILES_PATH',
-      dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR .
-      '_files' . DIRECTORY_SEPARATOR
-    );
-}
-
-require_once 'PHP/Token/Stream.php';
 
 /**
  * Tests for the PHP_Token_CLASS class.
@@ -58,7 +48,7 @@ require_once 'PHP/Token/Stream.php';
  * @package    PHP_TokenStream
  * @subpackage Tests
  * @author     Laurent Laville <pear@laurent-laville.org>
- * @copyright  2009-2012 Sebastian Bergmann <sb@sebastian-bergmann.de>
+ * @copyright  2009-2014 Sebastian Bergmann <sebastian@phpunit.de>
  * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
  * @version    Release: @package_version@
  * @link       http://github.com/sebastianbergmann/php-token-stream/
@@ -118,5 +108,11 @@ class PHP_Token_ClassTest extends PHPUnit_Framework_TestCase
                 $this->assertFalse($token->hasInterfaces());
             }
         }
+    }
+
+    public function testIssue30()
+    {
+        $ts = new PHP_Token_Stream(TEST_FILES_PATH . 'issue30.php');
+        $this->assertCount(1, $ts->getClasses());
     }
 }

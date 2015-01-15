@@ -2,7 +2,7 @@
 /**
  * PHPUnit
  *
- * Copyright (c) 2001-2013, Sebastian Bergmann <sebastian@phpunit.de>.
+ * Copyright (c) 2001-2014, Sebastian Bergmann <sebastian@phpunit.de>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,21 +36,18 @@
  *
  * @package    PHPUnit
  * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  2001-2013 Sebastian Bergmann <sebastian@phpunit.de>
+ * @copyright  2001-2014 Sebastian Bergmann <sebastian@phpunit.de>
  * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
  * @link       http://www.phpunit.de/
  * @since      File available since Release 2.3.0
  */
-
-require_once 'PHPUnit/Framework/TestCase.php';
-require_once 'BankAccount.php';
 
 /**
  * Tests for the BankAccount class.
  *
  * @package    PHPUnit
  * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  2001-2013 Sebastian Bergmann <sebastian@phpunit.de>
+ * @copyright  2001-2014 Sebastian Bergmann <sebastian@phpunit.de>
  * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 2.3.0
@@ -83,9 +80,7 @@ class BankAccountTest extends PHPUnit_Framework_TestCase
     {
         try {
             $this->ba->withdrawMoney(1);
-        }
-
-        catch (BankAccountException $e) {
+        } catch (BankAccountException $e) {
             $this->assertEquals(0, $this->ba->getBalance());
 
             return;
@@ -103,9 +98,7 @@ class BankAccountTest extends PHPUnit_Framework_TestCase
     {
         try {
             $this->ba->depositMoney(-1);
-        }
-
-        catch (BankAccountException $e) {
+        } catch (BankAccountException $e) {
             $this->assertEquals(0, $this->ba->getBalance());
 
             return;
