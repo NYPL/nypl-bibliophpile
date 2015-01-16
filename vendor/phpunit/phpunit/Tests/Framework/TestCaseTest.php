@@ -2,7 +2,7 @@
 /**
  * PHPUnit
  *
- * Copyright (c) 2001-2013, Sebastian Bergmann <sebastian@phpunit.de>.
+ * Copyright (c) 2001-2014, Sebastian Bergmann <sebastian@phpunit.de>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,28 +36,14 @@
  *
  * @package    PHPUnit
  * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  2001-2013 Sebastian Bergmann <sebastian@phpunit.de>
+ * @copyright  2001-2014 Sebastian Bergmann <sebastian@phpunit.de>
  * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
  * @link       http://www.phpunit.de/
  * @since      File available since Release 2.0.0
  */
 
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'Error.php';
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'ExceptionInAssertPostConditionsTest.php';
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'ExceptionInAssertPreConditionsTest.php';
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'ExceptionInSetUpTest.php';
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'ExceptionInTearDownTest.php';
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'ExceptionInTest.php';
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'Failure.php';
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'NoArgTestCaseTest.php';
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'OutputTestCase.php';
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'RequirementsTest.php';
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'Singleton.php';
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'Success.php';
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'ThrowExceptionTestCase.php';
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'ThrowNoExceptionTestCase.php';
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'WasRun.php';
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'ChangeCurrentWorkingDirectoryTest.php';
 
 $GLOBALS['a']  = 'a';
 $_ENV['b']     = 'b';
@@ -74,20 +60,26 @@ $GLOBALS['i']  = 'i';
  *
  * @package    PHPUnit
  * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  2001-2013 Sebastian Bergmann <sebastian@phpunit.de>
+ * @copyright  2001-2014 Sebastian Bergmann <sebastian@phpunit.de>
  * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
  * @link       http://www.phpunit.de/
  * @since      Class available since Release 2.0.0
+ * @covers     PHPUnit_Framework_TestCase
  */
 class Framework_TestCaseTest extends PHPUnit_Framework_TestCase
 {
     protected $backupGlobalsBlacklist = array('i', 'singleton');
 
+    /**
+     * Used be testStaticAttributesBackupPre
+     */
+    protected static $_testStatic = 0;
+
     public function testCaseToString()
     {
         $this->assertEquals(
-          'Framework_TestCaseTest::testCaseToString',
-          $this->toString()
+            'Framework_TestCaseTest::testCaseToString',
+            $this->toString()
         );
     }
 
@@ -212,6 +204,74 @@ class Framework_TestCaseTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($result->wasSuccessful());
     }
 
+    public function testExceptionWithMessage()
+    {
+        $test = new ThrowExceptionTestCase('test');
+        $test->setExpectedException('RuntimeException', 'A runtime error occurred');
+
+        $result = $test->run();
+
+        $this->assertEquals(1, count($result));
+        $this->assertTrue($result->wasSuccessful());
+    }
+
+    public function testExceptionWithWrongMessage()
+    {
+        $test = new ThrowExceptionTestCase('test');
+        $test->setExpectedException('RuntimeException', 'A logic error occurred');
+
+        $result = $test->run();
+
+        $this->assertEquals(1, $result->failureCount());
+        $this->assertEquals(1, count($result));
+        $this->assertEquals(
+            "Failed asserting that exception message 'A runtime error occurred' contains 'A logic error occurred'.",
+            $test->getStatusMessage()
+        );
+    }
+
+    public function testExceptionWithRegexpMessage()
+    {
+        $test = new ThrowExceptionTestCase('test');
+        $test->setExpectedExceptionRegExp('RuntimeException', '/runtime .*? occurred/');
+
+        $result = $test->run();
+
+        $this->assertEquals(1, count($result));
+        $this->assertTrue($result->wasSuccessful());
+    }
+
+    public function testExceptionWithWrongRegexpMessage()
+    {
+        $test = new ThrowExceptionTestCase('test');
+        $test->setExpectedExceptionRegExp('RuntimeException', '/logic .*? occurred/');
+
+        $result = $test->run();
+
+        $this->assertEquals(1, $result->failureCount());
+        $this->assertEquals(1, count($result));
+        $this->assertEquals(
+            "Failed asserting that exception message 'A runtime error occurred' matches '/logic .*? occurred/'.",
+            $test->getStatusMessage()
+        );
+    }
+
+    /**
+     * @covers PHPUnit_Framework_Constraint_ExceptionMessageRegExp
+     */
+    public function testExceptionWithInvalidRegexpMessage()
+    {
+        $test = new ThrowExceptionTestCase('test');
+        $test->setExpectedExceptionRegExp('RuntimeException', '#runtime .*? occurred/'); // wrong delimiter
+
+        $result = $test->run();
+
+        $this->assertEquals(
+            "Invalid expected exception message regex given: '#runtime .*? occurred/'",
+            $test->getStatusMessage()
+        );
+    }
+
     public function testNoException()
     {
         $test = new ThrowNoExceptionTestCase('test');
@@ -306,11 +366,35 @@ class Framework_TestCaseTest extends PHPUnit_Framework_TestCase
     public function testStaticAttributesBackupPre()
     {
         $GLOBALS['singleton'] = Singleton::getInstance();
+        self::$_testStatic = 123;
     }
 
+    /**
+     * @depends testStaticAttributesBackupPre
+     */
     public function testStaticAttributesBackupPost()
     {
         $this->assertNotSame($GLOBALS['singleton'], Singleton::getInstance());
+        $this->assertSame(0, self::$_testStatic);
+    }
+
+    public function testIsInIsolationReturnsFalse()
+    {
+        $test   = new IsolationTest('testIsInIsolationReturnsFalse');
+        $result = $test->run();
+
+        $this->assertEquals(1, count($result));
+        $this->assertTrue($result->wasSuccessful());
+    }
+
+    public function testIsInIsolationReturnsTrue()
+    {
+        $test   = new IsolationTest('testIsInIsolationReturnsTrue');
+        $test->setRunTestInSeparateProcess(true);
+        $result = $test->run();
+
+        $this->assertEquals(1, count($result));
+        $this->assertTrue($result->wasSuccessful());
     }
 
     public function testExpectOutputStringFooActualFoo()
@@ -356,8 +440,8 @@ class Framework_TestCaseTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, $result->skippedCount());
         $this->assertEquals(
-          'PHPUnit 1111111 (or later) is required.',
-          $test->getStatusMessage()
+            'PHPUnit 1111111 (or later) is required.',
+            $test->getStatusMessage()
         );
     }
 
@@ -368,8 +452,20 @@ class Framework_TestCaseTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, $result->skippedCount());
         $this->assertEquals(
-          'PHP 9999999 (or later) is required.',
-          $test->getStatusMessage()
+            'PHP 9999999 (or later) is required.',
+            $test->getStatusMessage()
+        );
+    }
+
+    public function testSkipsIfRequiresNonExistingOs()
+    {
+        $test   = new RequirementsTest('testAlwaysSkip3');
+        $result = $test->run();
+
+        $this->assertEquals(1, $result->skippedCount());
+        $this->assertEquals(
+            'Operating system matching /DOESNOTEXIST/i is required.',
+            $test->getStatusMessage()
         );
     }
 
@@ -380,8 +476,8 @@ class Framework_TestCaseTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, $result->skippedCount());
         $this->assertEquals(
-          'Function testFunc is required.',
-          $test->getStatusMessage()
+            'Function testFunc is required.',
+            $test->getStatusMessage()
         );
     }
 
@@ -391,8 +487,8 @@ class Framework_TestCaseTest extends PHPUnit_Framework_TestCase
         $result = $test->run();
 
         $this->assertEquals(
-          'Extension testExt is required.',
-          $test->getStatusMessage()
+            'Extension testExt is required.',
+            $test->getStatusMessage()
         );
     }
 
@@ -402,14 +498,22 @@ class Framework_TestCaseTest extends PHPUnit_Framework_TestCase
         $result = $test->run();
 
         $this->assertEquals(
-          'PHP 99-dev (or later) is required.' . PHP_EOL .
-          'PHPUnit 9-dev (or later) is required.' . PHP_EOL .
-          'Function testFuncOne is required.' . PHP_EOL .
-          'Function testFuncTwo is required.' . PHP_EOL .
-          'Extension testExtOne is required.' . PHP_EOL .
-          'Extension testExtTwo is required.',
-          $test->getStatusMessage()
+            'PHP 99-dev (or later) is required.' . PHP_EOL .
+            'PHPUnit 9-dev (or later) is required.' . PHP_EOL .
+            'Operating system matching /DOESNOTEXIST/i is required.' . PHP_EOL .
+            'Function testFuncOne is required.' . PHP_EOL .
+            'Function testFuncTwo is required.' . PHP_EOL .
+            'Extension testExtOne is required.' . PHP_EOL .
+            'Extension testExtTwo is required.',
+            $test->getStatusMessage()
         );
+    }
+
+    public function testRequiringAnExistingMethodDoesNotSkip()
+    {
+        $test   = new RequirementsTest('testExistingMethod');
+        $result = $test->run();
+        $this->assertEquals(0, $result->skippedCount());
     }
 
     public function testRequiringAnExistingFunctionDoesNotSkip()
@@ -426,6 +530,13 @@ class Framework_TestCaseTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $result->skippedCount());
     }
 
+    public function testRequiringAnExistingOsDoesNotSkip()
+    {
+        $test   = new RequirementsTest('testExistingOs');
+        $result = $test->run();
+        $this->assertEquals(0, $result->skippedCount());
+    }
+
     public function testCurrentWorkingDirectoryIsRestored()
     {
         $expectedCwd = getcwd();
@@ -435,5 +546,4 @@ class Framework_TestCaseTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame($expectedCwd, getcwd());
     }
-
 }
