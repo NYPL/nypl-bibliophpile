@@ -10,23 +10,34 @@
     "authors": [
         {
             "name": "Sebastian Bergmann",
-            "email": "sb@sebastian-bergmann.de",
+            "email": "sebastian@phpunit.de",
             "role": "lead"
         }
     ],
     "support": {
-        "issues": "https://github.com/sebastianbergmann/php-text-template/issues",
-        "irc": "irc://irc.freenode.net/phpunit"
+        "issues": "https://github.com/sebastianbergmann/php-text-template/issues"
+    },
+    "config": {
+        "platform": {
+            "php": "7.3.0"
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
     },
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=7.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.3"
     },
     "autoload": {
         "classmap": [
-            "Text/"
+            "src/"
         ]
     },
-    "include-path": [
-        ""
-    ]
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0-dev"
+        }
+    }
 }

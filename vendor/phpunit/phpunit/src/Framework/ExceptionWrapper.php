@@ -1,47 +1,19 @@
-<?php
-/**
- * PHPUnit
+<?php declare(strict_types=1);
+/*
+ * This file is part of PHPUnit.
  *
- * Copyright (c) 2001-2014, Sebastian Bergmann <sebastian@phpunit.de>.
- * All rights reserved.
+ * (c) Sebastian Bergmann <sebastian@phpunit.de>
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
- *
- *   * Neither the name of Sebastian Bergmann nor the names of his
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * @package    PHPUnit
- * @subpackage Framework
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  2001-2014 Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @link       http://www.phpunit.de/
- * @since      File available since Release 4.3.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+namespace PHPUnit\Framework;
+
+use function array_keys;
+use function get_class;
+use function spl_object_hash;
+use PHPUnit\Util\Filter;
+use Throwable;
 
 /**
  * Wraps Exceptions thrown by code under test.
@@ -49,73 +21,37 @@
  * Re-instantiates Exceptions thrown by user-space code to retain their original
  * class names, properties, and stack traces (but without arguments).
  *
- * Unlike PHPUnit_Framework_Exception, the complete stack of previous Exceptions
+ * Unlike PHPUnit\Framework\Exception, the complete stack of previous Exceptions
  * is processed.
  *
- * @package    PHPUnit
- * @subpackage Framework
- * @author     Daniel F. Kudwien <sun@unleashedmind.com>
- * @copyright  2001-2014 Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @link       http://www.phpunit.de/
- * @since      Class available since Release 4.3.0
+ * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-class PHPUnit_Framework_ExceptionWrapper extends PHPUnit_Framework_Exception
+final class ExceptionWrapper extends Exception
 {
     /**
      * @var string
      */
-    protected $classname;
+    protected $className;
 
     /**
-     * @var PHPUnit_Framework_ExceptionWrapper|null
+     * @var null|ExceptionWrapper
      */
     protected $previous;
 
-    public function __construct(Exception $e)
+    public function __construct(Throwable $t)
     {
         // PDOException::getCode() is a string.
-        // @see http://php.net/manual/en/class.pdoexception.php#95812
-        parent::__construct($e->getMessage(), (int) $e->getCode());
+        // @see https://php.net/manual/en/class.pdoexception.php#95812
+        parent::__construct($t->getMessage(), (int) $t->getCode());
 
-        $this->classname = get_class($e);
-        $this->file = $e->getFile();
-        $this->line = $e->getLine();
-
-        $this->serializableTrace = $e->getTrace();
-        foreach ($this->serializableTrace as $i => $call) {
-            unset($this->serializableTrace[$i]['args']);
-        }
-
-        if ($e->getPrevious()) {
-            $this->previous = new self($e->getPrevious());
-        }
+        $this->setOriginalException($t);
     }
 
-    /**
-     * @return string
-     */
-    public function getClassname()
+    public function __toString(): string
     {
-        return $this->classname;
-    }
+        $string = TestFailure::exceptionToString($this);
 
-    /**
-     * @return PHPUnit_Framework_ExceptionWrapper
-     */
-    public function getPreviousWrapped()
-    {
-        return $this->previous;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        $string = PHPUnit_Framework_TestFailure::exceptionToString($this);
-
-        if ($trace = PHPUnit_Util_Filter::getFilteredStacktrace($this)) {
+        if ($trace = Filter::getFilteredStacktrace($this)) {
             $string .= "\n" . $trace;
         }
 
@@ -124,5 +60,63 @@ class PHPUnit_Framework_ExceptionWrapper extends PHPUnit_Framework_Exception
         }
 
         return $string;
+    }
+
+    public function getClassName(): string
+    {
+        return $this->className;
+    }
+
+    public function getPreviousWrapped(): ?self
+    {
+        return $this->previous;
+    }
+
+    public function setClassName(string $className): void
+    {
+        $this->className = $className;
+    }
+
+    public function setOriginalException(Throwable $t): void
+    {
+        $this->originalException($t);
+
+        $this->className = get_class($t);
+        $this->file      = $t->getFile();
+        $this->line      = $t->getLine();
+
+        $this->serializableTrace = $t->getTrace();
+
+        foreach (array_keys($this->serializableTrace) as $key) {
+            unset($this->serializableTrace[$key]['args']);
+        }
+
+        if ($t->getPrevious()) {
+            $this->previous = new self($t->getPrevious());
+        }
+    }
+
+    public function getOriginalException(): ?Throwable
+    {
+        return $this->originalException();
+    }
+
+    /**
+     * Method to contain static originalException to exclude it from stacktrace to prevent the stacktrace contents,
+     * which can be quite big, from being garbage-collected, thus blocking memory until shutdown.
+     *
+     * Approach works both for var_dump() and var_export() and print_r().
+     */
+    private function originalException(Throwable $exceptionToStore = null): ?Throwable
+    {
+        static $originalExceptions;
+
+        $instanceId = spl_object_hash($this);
+
+        if ($exceptionToStore) {
+            $originalExceptions[$instanceId] = $exceptionToStore;
+        }
+
+        return $originalExceptions[$instanceId] ?? null;
     }
 }

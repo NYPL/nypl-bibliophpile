@@ -1,208 +1,116 @@
-<?php
-/**
- * PHPUnit
+<?php declare(strict_types=1);
+/*
+ * This file is part of PHPUnit.
  *
- * Copyright (c) 2001-2014, Sebastian Bergmann <sebastian@phpunit.de>.
- * All rights reserved.
+ * (c) Sebastian Bergmann <sebastian@phpunit.de>
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
- *
- *   * Neither the name of Sebastian Bergmann nor the names of his
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * @package    PHPUnit
- * @subpackage Util
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  2001-2014 Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @link       http://www.phpunit.de/
- * @since      File available since Release 2.0.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+namespace PHPUnit\Util;
+
+use const ENT_COMPAT;
+use const ENT_SUBSTITUTE;
+use const PHP_SAPI;
+use function assert;
+use function count;
+use function dirname;
+use function explode;
+use function fclose;
+use function fopen;
+use function fsockopen;
+use function fwrite;
+use function htmlspecialchars;
+use function is_resource;
+use function is_string;
+use function sprintf;
+use function str_replace;
+use function strncmp;
+use function strpos;
 
 /**
- * Utility class that can print to STDOUT or write to a file.
- *
- * @package    PHPUnit
- * @subpackage Util
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  2001-2014 Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @link       http://www.phpunit.de/
- * @since      Class available since Release 2.0.0
+ * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-class PHPUnit_Util_Printer
+class Printer
 {
     /**
-     * If true, flush output after every write.
+     * @psalm-var closed-resource|resource
+     */
+    private $stream;
+
+    /**
+     * @var bool
+     */
+    private $isPhpStream;
+
+    /**
+     * @param null|resource|string $out
      *
-     * @var boolean
-     */
-    protected $autoFlush = false;
-
-    /**
-     * @var    resource
-     */
-    protected $out;
-
-    /**
-     * @var    string
-     */
-    protected $outTarget;
-
-    /**
-     * @var    boolean
-     */
-    protected $printsHTML = false;
-
-    /**
-     * Constructor.
-     *
-     * @param  mixed                       $out
-     * @throws PHPUnit_Framework_Exception
+     * @throws Exception
      */
     public function __construct($out = null)
     {
-        if ($out !== null) {
-            if (is_string($out)) {
-                if (strpos($out, 'socket://') === 0) {
-                    $out = explode(':', str_replace('socket://', '', $out));
+        if (is_resource($out)) {
+            $this->stream = $out;
 
-                    if (sizeof($out) != 2) {
-                        throw new PHPUnit_Framework_Exception;
-                    }
+            return;
+        }
 
-                    $this->out = fsockopen($out[0], $out[1]);
-                } else {
-                    if (strpos($out, 'php://') === false &&
-                        !is_dir(dirname($out))) {
-                        mkdir(dirname($out), 0777, true);
-                    }
+        if (!is_string($out)) {
+            return;
+        }
 
-                    $this->out = fopen($out, 'wt');
-                }
+        if (strpos($out, 'socket://') === 0) {
+            $tmp = explode(':', str_replace('socket://', '', $out));
 
-                $this->outTarget = $out;
-            } else {
-                $this->out = $out;
+            if (count($tmp) !== 2) {
+                throw new Exception(
+                    sprintf(
+                        '"%s" does not match "socket://hostname:port" format',
+                        $out
+                    )
+                );
             }
-        }
-    }
 
-    /**
-     * Flush buffer, optionally tidy up HTML, and close output if it's not to a php stream
-     */
-    public function flush()
-    {
-        if ($this->out && strncmp($this->outTarget, 'php://', 6) !== 0) {
-            fclose($this->out);
+            $this->stream = fsockopen($tmp[0], (int) $tmp[1]);
+
+            return;
         }
 
-        if ($this->printsHTML === true &&
-            $this->outTarget !== null &&
-            strpos($this->outTarget, 'php://') !== 0 &&
-            strpos($this->outTarget, 'socket://') !== 0 &&
-            extension_loaded('tidy')) {
-            file_put_contents(
-                $this->outTarget,
-                tidy_repair_file(
-                    $this->outTarget, array('indent' => true, 'wrap' => 0), 'utf8'
+        if (strpos($out, 'php://') === false && !Filesystem::createDirectory(dirname($out))) {
+            throw new Exception(
+                sprintf(
+                    'Directory "%s" was not created',
+                    dirname($out)
                 )
             );
         }
+
+        $this->stream      = fopen($out, 'wb');
+        $this->isPhpStream = strncmp($out, 'php://', 6) !== 0;
     }
 
-    /**
-     * Performs a safe, incremental flush.
-     *
-     * Do not confuse this function with the flush() function of this class,
-     * since the flush() function may close the file being written to, rendering
-     * the current object no longer usable.
-     *
-     * @since  Method available since Release 3.3.0
-     */
-    public function incrementalFlush()
+    public function write(string $buffer): void
     {
-        if ($this->out) {
-            fflush($this->out);
-        } else {
-            flush();
-        }
-    }
+        if ($this->stream) {
+            assert(is_resource($this->stream));
 
-    /**
-     * @param string $buffer
-     */
-    public function write($buffer)
-    {
-        if ($this->out) {
-            fwrite($this->out, $buffer);
-
-            if ($this->autoFlush) {
-                $this->incrementalFlush();
-            }
+            fwrite($this->stream, $buffer);
         } else {
-            if (PHP_SAPI != 'cli') {
-                $buffer = htmlspecialchars($buffer);
+            if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
+                $buffer = htmlspecialchars($buffer, ENT_COMPAT | ENT_SUBSTITUTE);
             }
 
             print $buffer;
-
-            if ($this->autoFlush) {
-                $this->incrementalFlush();
-            }
         }
     }
 
-    /**
-     * Check auto-flush mode.
-     *
-     * @return boolean
-     * @since  Method available since Release 3.3.0
-     */
-    public function getAutoFlush()
+    public function flush(): void
     {
-        return $this->autoFlush;
-    }
+        if ($this->stream && $this->isPhpStream) {
+            assert(is_resource($this->stream));
 
-    /**
-     * Set auto-flushing mode.
-     *
-     * If set, *incremental* flushes will be done after each write. This should
-     * not be confused with the different effects of this class' flush() method.
-     *
-     * @param boolean $autoFlush
-     * @since  Method available since Release 3.3.0
-     */
-    public function setAutoFlush($autoFlush)
-    {
-        if (is_bool($autoFlush)) {
-            $this->autoFlush = $autoFlush;
-        } else {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
+            fclose($this->stream);
         }
     }
 }

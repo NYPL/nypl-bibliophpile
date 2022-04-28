@@ -1,209 +1,255 @@
-<?php
-/**
- * PHPUnit
+<?php declare(strict_types=1);
+/*
+ * This file is part of PHPUnit.
  *
- * Copyright (c) 2001-2014, Sebastian Bergmann <sebastian@phpunit.de>.
- * All rights reserved.
+ * (c) Sebastian Bergmann <sebastian@phpunit.de>
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
- *
- *   * Neither the name of Sebastian Bergmann nor the names of his
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * @package    PHPUnit
- * @subpackage Framework
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  2001-2014 Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @link       http://www.phpunit.de/
- * @since      File available since Release 2.0.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+namespace PHPUnit\Framework;
+
+use const PHP_EOL;
+use function count;
+use function function_exists;
+use function get_class;
+use function sprintf;
+use function xdebug_get_monitored_functions;
+use function xdebug_is_debugger_active;
+use function xdebug_start_function_monitor;
+use function xdebug_stop_function_monitor;
+use AssertionError;
+use Countable;
+use Error;
+use PHPUnit\Util\ErrorHandler;
+use PHPUnit\Util\ExcludeList;
+use PHPUnit\Util\Printer;
+use PHPUnit\Util\Test as TestUtil;
+use ReflectionClass;
+use ReflectionException;
+use SebastianBergmann\CodeCoverage\CodeCoverage;
+use SebastianBergmann\CodeCoverage\Exception as OriginalCodeCoverageException;
+use SebastianBergmann\CodeCoverage\UnintentionallyCoveredCodeException;
+use SebastianBergmann\Invoker\Invoker;
+use SebastianBergmann\Invoker\TimeoutException;
+use SebastianBergmann\ResourceOperations\ResourceOperations;
+use SebastianBergmann\Timer\Timer;
+use Throwable;
 
 /**
- * A TestResult collects the results of executing a test case.
- *
- * @package    PHPUnit
- * @subpackage Framework
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  2001-2014 Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @link       http://www.phpunit.de/
- * @since      Class available since Release 2.0.0
+ * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-class PHPUnit_Framework_TestResult implements Countable
+final class TestResult implements Countable
 {
     /**
      * @var array
      */
-    protected $passed = array();
+    private $passed = [];
 
     /**
-     * @var array
+     * @var array<string>
      */
-    protected $errors = array();
+    private $passedTestClasses = [];
 
     /**
-     * @var array
+     * @var bool
      */
-    protected $failures = array();
+    private $currentTestSuiteFailed = false;
 
     /**
-     * @var array
+     * @var TestFailure[]
      */
-    protected $notImplemented = array();
+    private $errors = [];
 
     /**
-     * @var array
+     * @var TestFailure[]
      */
-    protected $risky = array();
+    private $failures = [];
 
     /**
-     * @var array
+     * @var TestFailure[]
      */
-    protected $skipped = array();
+    private $warnings = [];
 
     /**
-     * @var array
+     * @var TestFailure[]
      */
-    protected $listeners = array();
+    private $notImplemented = [];
 
     /**
-     * @var integer
+     * @var TestFailure[]
      */
-    protected $runTests = 0;
+    private $risky = [];
+
+    /**
+     * @var TestFailure[]
+     */
+    private $skipped = [];
+
+    /**
+     * @deprecated Use the `TestHook` interfaces instead
+     *
+     * @var TestListener[]
+     */
+    private $listeners = [];
+
+    /**
+     * @var int
+     */
+    private $runTests = 0;
 
     /**
      * @var float
      */
-    protected $time = 0;
-
-    /**
-     * @var PHPUnit_Framework_TestSuite
-     */
-    protected $topTestSuite = null;
+    private $time = 0;
 
     /**
      * Code Coverage information.
      *
-     * @var PHP_CodeCoverage
+     * @var CodeCoverage
      */
-    protected $codeCoverage;
+    private $codeCoverage;
 
     /**
-     * @var boolean
+     * @var bool
      */
-    protected $convertErrorsToExceptions = true;
+    private $convertDeprecationsToExceptions = false;
 
     /**
-     * @var boolean
+     * @var bool
      */
-    protected $stop = false;
+    private $convertErrorsToExceptions = true;
 
     /**
-     * @var boolean
+     * @var bool
      */
-    protected $stopOnError = false;
+    private $convertNoticesToExceptions = true;
 
     /**
-     * @var boolean
+     * @var bool
      */
-    protected $stopOnFailure = false;
+    private $convertWarningsToExceptions = true;
 
     /**
-     * @var boolean
+     * @var bool
      */
-    protected $beStrictAboutTestsThatDoNotTestAnything = false;
+    private $stop = false;
 
     /**
-     * @var boolean
+     * @var bool
      */
-    protected $beStrictAboutOutputDuringTests = false;
+    private $stopOnError = false;
 
     /**
-     * @var boolean
+     * @var bool
      */
-    protected $beStrictAboutTestSize = false;
+    private $stopOnFailure = false;
 
     /**
-     * @var boolean
+     * @var bool
      */
-    protected $beStrictAboutTodoAnnotatedTests = false;
+    private $stopOnWarning = false;
 
     /**
-     * @var boolean
+     * @var bool
      */
-    protected $stopOnRisky = false;
+    private $beStrictAboutTestsThatDoNotTestAnything = true;
 
     /**
-     * @var boolean
+     * @var bool
      */
-    protected $stopOnIncomplete = false;
+    private $beStrictAboutOutputDuringTests = false;
 
     /**
-     * @var boolean
+     * @var bool
      */
-    protected $stopOnSkipped = false;
+    private $beStrictAboutTodoAnnotatedTests = false;
 
     /**
-     * @var boolean
+     * @var bool
      */
-    protected $lastTestFailed = false;
+    private $beStrictAboutResourceUsageDuringSmallTests = false;
 
     /**
-     * @var integer
+     * @var bool
      */
-    protected $timeoutForSmallTests = 1;
+    private $enforceTimeLimit = false;
 
     /**
-     * @var integer
+     * @var bool
      */
-    protected $timeoutForMediumTests = 10;
+    private $forceCoversAnnotation = false;
 
     /**
-     * @var integer
+     * @var int
      */
-    protected $timeoutForLargeTests = 60;
+    private $timeoutForSmallTests = 1;
 
     /**
-     * Registers a TestListener.
+     * @var int
+     */
+    private $timeoutForMediumTests = 10;
+
+    /**
+     * @var int
+     */
+    private $timeoutForLargeTests = 60;
+
+    /**
+     * @var bool
+     */
+    private $stopOnRisky = false;
+
+    /**
+     * @var bool
+     */
+    private $stopOnIncomplete = false;
+
+    /**
+     * @var bool
+     */
+    private $stopOnSkipped = false;
+
+    /**
+     * @var bool
+     */
+    private $lastTestFailed = false;
+
+    /**
+     * @var int
+     */
+    private $defaultTimeLimit = 0;
+
+    /**
+     * @var bool
+     */
+    private $stopOnDefect = false;
+
+    /**
+     * @var bool
+     */
+    private $registerMockObjectsFromTestArgumentsRecursively = false;
+
+    /**
+     * @deprecated Use the `TestHook` interfaces instead
      *
-     * @param  PHPUnit_Framework_TestListener
+     * @codeCoverageIgnore
+     *
+     * Registers a TestListener.
      */
-    public function addListener(PHPUnit_Framework_TestListener $listener)
+    public function addListener(TestListener $listener): void
     {
         $this->listeners[] = $listener;
     }
 
     /**
-     * Unregisters a TestListener.
+     * @deprecated Use the `TestHook` interfaces instead
      *
-     * @param PHPUnit_Framework_TestListener $listener
+     * @codeCoverageIgnore
+     *
+     * Unregisters a TestListener.
      */
-    public function removeListener(PHPUnit_Framework_TestListener $listener)
+    public function removeListener(TestListener $listener): void
     {
         foreach ($this->listeners as $key => $_listener) {
             if ($listener === $_listener) {
@@ -213,14 +259,16 @@ class PHPUnit_Framework_TestResult implements Countable
     }
 
     /**
-     * Flushes all flushable TestListeners.
+     * @deprecated Use the `TestHook` interfaces instead
      *
-     * @since  Method available since Release 3.0.0
+     * @codeCoverageIgnore
+     *
+     * Flushes all flushable TestListeners.
      */
-    public function flushListeners()
+    public function flushListeners(): void
     {
         foreach ($this->listeners as $listener) {
-            if ($listener instanceof PHPUnit_Util_Printer) {
+            if ($listener instanceof Printer) {
                 $listener->flush();
             }
         }
@@ -228,110 +276,136 @@ class PHPUnit_Framework_TestResult implements Countable
 
     /**
      * Adds an error to the list of errors.
-     *
-     * @param PHPUnit_Framework_Test $test
-     * @param Exception              $e
-     * @param float                  $time
      */
-    public function addError(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addError(Test $test, Throwable $t, float $time): void
     {
-        if ($e instanceof PHPUnit_Framework_RiskyTest) {
-            $this->risky[] = new PHPUnit_Framework_TestFailure($test, $e);
-            $notifyMethod  = 'addRiskyTest';
+        if ($t instanceof RiskyTestError) {
+            $this->recordRisky($test, $t);
 
-            if ($this->stopOnRisky) {
+            $notifyMethod = 'addRiskyTest';
+
+            if ($test instanceof TestCase) {
+                $test->markAsRisky();
+            }
+
+            if ($this->stopOnRisky || $this->stopOnDefect) {
                 $this->stop();
             }
-        } elseif ($e instanceof PHPUnit_Framework_IncompleteTest) {
-            $this->notImplemented[] = new PHPUnit_Framework_TestFailure($test, $e);
-            $notifyMethod           = 'addIncompleteTest';
+        } elseif ($t instanceof IncompleteTest) {
+            $this->recordNotImplemented($test, $t);
+
+            $notifyMethod = 'addIncompleteTest';
 
             if ($this->stopOnIncomplete) {
                 $this->stop();
             }
-        } elseif ($e instanceof PHPUnit_Framework_SkippedTest) {
-            $this->skipped[] = new PHPUnit_Framework_TestFailure($test, $e);
-            $notifyMethod    = 'addSkippedTest';
+        } elseif ($t instanceof SkippedTest) {
+            $this->recordSkipped($test, $t);
+
+            $notifyMethod = 'addSkippedTest';
 
             if ($this->stopOnSkipped) {
                 $this->stop();
             }
         } else {
-            $this->errors[] = new PHPUnit_Framework_TestFailure($test, $e);
-            $notifyMethod   = 'addError';
+            $this->recordError($test, $t);
+
+            $notifyMethod = 'addError';
 
             if ($this->stopOnError || $this->stopOnFailure) {
                 $this->stop();
             }
         }
 
+        // @see https://github.com/sebastianbergmann/phpunit/issues/1953
+        if ($t instanceof Error) {
+            $t = new ExceptionWrapper($t);
+        }
+
         foreach ($this->listeners as $listener) {
-            $listener->$notifyMethod($test, $e, $time);
+            $listener->{$notifyMethod}($test, $t, $time);
         }
 
         $this->lastTestFailed = true;
-        $this->time          += $time;
+        $this->time += $time;
+    }
+
+    /**
+     * Adds a warning to the list of warnings.
+     * The passed in exception caused the warning.
+     */
+    public function addWarning(Test $test, Warning $e, float $time): void
+    {
+        if ($this->stopOnWarning || $this->stopOnDefect) {
+            $this->stop();
+        }
+
+        $this->recordWarning($test, $e);
+
+        foreach ($this->listeners as $listener) {
+            $listener->addWarning($test, $e, $time);
+        }
+
+        $this->time += $time;
     }
 
     /**
      * Adds a failure to the list of failures.
      * The passed in exception caused the failure.
-     *
-     * @param PHPUnit_Framework_Test                 $test
-     * @param PHPUnit_Framework_AssertionFailedError $e
-     * @param float                                  $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time)
+    public function addFailure(Test $test, AssertionFailedError $e, float $time): void
     {
-        if ($e instanceof PHPUnit_Framework_RiskyTest) {
-            $this->risky[] = new PHPUnit_Framework_TestFailure($test, $e);
-            $notifyMethod  = 'addRiskyTest';
+        if ($e instanceof RiskyTestError || $e instanceof OutputError) {
+            $this->recordRisky($test, $e);
 
-            if ($this->stopOnRisky) {
+            $notifyMethod = 'addRiskyTest';
+
+            if ($test instanceof TestCase) {
+                $test->markAsRisky();
+            }
+
+            if ($this->stopOnRisky || $this->stopOnDefect) {
                 $this->stop();
             }
-        } elseif ($e instanceof PHPUnit_Framework_IncompleteTest) {
-            $this->notImplemented[] = new PHPUnit_Framework_TestFailure($test, $e);
-            $notifyMethod           = 'addIncompleteTest';
+        } elseif ($e instanceof IncompleteTest) {
+            $this->recordNotImplemented($test, $e);
+
+            $notifyMethod = 'addIncompleteTest';
 
             if ($this->stopOnIncomplete) {
                 $this->stop();
             }
-        } elseif ($e instanceof PHPUnit_Framework_SkippedTest) {
-            $this->skipped[] = new PHPUnit_Framework_TestFailure($test, $e);
-            $notifyMethod    = 'addSkippedTest';
+        } elseif ($e instanceof SkippedTest) {
+            $this->recordSkipped($test, $e);
+
+            $notifyMethod = 'addSkippedTest';
 
             if ($this->stopOnSkipped) {
                 $this->stop();
             }
         } else {
-            $this->failures[] = new PHPUnit_Framework_TestFailure($test, $e);
+            $this->failures[] = new TestFailure($test, $e);
             $notifyMethod     = 'addFailure';
 
-            if ($this->stopOnFailure) {
+            if ($this->stopOnFailure || $this->stopOnDefect) {
                 $this->stop();
             }
         }
 
         foreach ($this->listeners as $listener) {
-            $listener->$notifyMethod($test, $e, $time);
+            $listener->{$notifyMethod}($test, $e, $time);
         }
 
         $this->lastTestFailed = true;
-        $this->time          += $time;
+        $this->time += $time;
     }
 
     /**
-     * Informs the result that a testsuite will be started.
-     *
-     * @param PHPUnit_Framework_TestSuite $suite
-     * @since  Method available since Release 2.2.0
+     * Informs the result that a test suite will be started.
      */
-    public function startTestSuite(PHPUnit_Framework_TestSuite $suite)
+    public function startTestSuite(TestSuite $suite): void
     {
-        if ($this->topTestSuite === null) {
-            $this->topTestSuite = $suite;
-        }
+        $this->currentTestSuiteFailed = false;
 
         foreach ($this->listeners as $listener) {
             $listener->startTestSuite($suite);
@@ -339,13 +413,14 @@ class PHPUnit_Framework_TestResult implements Countable
     }
 
     /**
-     * Informs the result that a testsuite was completed.
-     *
-     * @param PHPUnit_Framework_TestSuite $suite
-     * @since  Method available since Release 2.2.0
+     * Informs the result that a test suite was completed.
      */
-    public function endTestSuite(PHPUnit_Framework_TestSuite $suite)
+    public function endTestSuite(TestSuite $suite): void
     {
+        if (!$this->currentTestSuiteFailed) {
+            $this->passedTestClasses[] = $suite->getName();
+        }
+
         foreach ($this->listeners as $listener) {
             $listener->endTestSuite($suite);
         }
@@ -353,13 +428,11 @@ class PHPUnit_Framework_TestResult implements Countable
 
     /**
      * Informs the result that a test will be started.
-     *
-     * @param PHPUnit_Framework_Test $test
      */
-    public function startTest(PHPUnit_Framework_Test $test)
+    public function startTest(Test $test): void
     {
         $this->lastTestFailed = false;
-        $this->runTests      += count($test);
+        $this->runTests += count($test);
 
         foreach ($this->listeners as $listener) {
             $listener->startTest($test);
@@ -369,196 +442,188 @@ class PHPUnit_Framework_TestResult implements Countable
     /**
      * Informs the result that a test was completed.
      *
-     * @param PHPUnit_Framework_Test $test
-     * @param float                  $time
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function endTest(PHPUnit_Framework_Test $test, $time)
+    public function endTest(Test $test, float $time): void
     {
         foreach ($this->listeners as $listener) {
             $listener->endTest($test, $time);
         }
 
-        if (!$this->lastTestFailed && $test instanceof PHPUnit_Framework_TestCase) {
-            $class  = get_class($test);
-            $key    =  $class . '::' . $test->getName();
+        if (!$this->lastTestFailed && $test instanceof TestCase) {
+            $class = get_class($test);
+            $key   = $class . '::' . $test->getName();
 
-            $this->passed[$key] = array(
-              'result' => $test->getResult(),
-              'size'   => PHPUnit_Util_Test::getSize(
-                  $class,
-                  $test->getName(false)
-              )
-            );
+            $this->passed[$key] = [
+                'result' => $test->getResult(),
+                'size'   => TestUtil::getSize(
+                    $class,
+                    $test->getName(false)
+                ),
+            ];
 
             $this->time += $time;
+        }
+
+        if ($this->lastTestFailed && $test instanceof TestCase) {
+            $this->currentTestSuiteFailed = true;
         }
     }
 
     /**
      * Returns true if no risky test occurred.
-     *
-     * @return boolean
-     * @since  Method available since Release 4.0.0
      */
-    public function allHarmless()
+    public function allHarmless(): bool
     {
-        return $this->riskyCount() == 0;
+        return $this->riskyCount() === 0;
     }
 
     /**
      * Gets the number of risky tests.
-     *
-     * @return integer
-     * @since  Method available since Release 4.0.0
      */
-    public function riskyCount()
+    public function riskyCount(): int
     {
         return count($this->risky);
     }
 
     /**
      * Returns true if no incomplete test occurred.
-     *
-     * @return boolean
      */
-    public function allCompletelyImplemented()
+    public function allCompletelyImplemented(): bool
     {
-        return $this->notImplementedCount() == 0;
+        return $this->notImplementedCount() === 0;
     }
 
     /**
      * Gets the number of incomplete tests.
-     *
-     * @return integer
      */
-    public function notImplementedCount()
+    public function notImplementedCount(): int
     {
         return count($this->notImplemented);
     }
 
     /**
-     * Returns an Enumeration for the risky tests.
+     * Returns an array of TestFailure objects for the risky tests.
      *
-     * @return array
-     * @since  Method available since Release 4.0.0
+     * @return TestFailure[]
      */
-    public function risky()
+    public function risky(): array
     {
         return $this->risky;
     }
 
     /**
-     * Returns an Enumeration for the incomplete tests.
+     * Returns an array of TestFailure objects for the incomplete tests.
      *
-     * @return array
+     * @return TestFailure[]
      */
-    public function notImplemented()
+    public function notImplemented(): array
     {
         return $this->notImplemented;
     }
 
     /**
      * Returns true if no test has been skipped.
-     *
-     * @return boolean
-     * @since  Method available since Release 3.0.0
      */
-    public function noneSkipped()
+    public function noneSkipped(): bool
     {
-        return $this->skippedCount() == 0;
+        return $this->skippedCount() === 0;
     }
 
     /**
      * Gets the number of skipped tests.
-     *
-     * @return integer
-     * @since  Method available since Release 3.0.0
      */
-    public function skippedCount()
+    public function skippedCount(): int
     {
         return count($this->skipped);
     }
 
     /**
-     * Returns an Enumeration for the skipped tests.
+     * Returns an array of TestFailure objects for the skipped tests.
      *
-     * @return array
-     * @since  Method available since Release 3.0.0
+     * @return TestFailure[]
      */
-    public function skipped()
+    public function skipped(): array
     {
         return $this->skipped;
     }
 
     /**
      * Gets the number of detected errors.
-     *
-     * @return integer
      */
-    public function errorCount()
+    public function errorCount(): int
     {
         return count($this->errors);
     }
 
     /**
-     * Returns an Enumeration for the errors.
+     * Returns an array of TestFailure objects for the errors.
      *
-     * @return array
+     * @return TestFailure[]
      */
-    public function errors()
+    public function errors(): array
     {
         return $this->errors;
     }
 
     /**
      * Gets the number of detected failures.
-     *
-     * @return integer
      */
-    public function failureCount()
+    public function failureCount(): int
     {
         return count($this->failures);
     }
 
     /**
-     * Returns an Enumeration for the failures.
+     * Returns an array of TestFailure objects for the failures.
      *
-     * @return array
+     * @return TestFailure[]
      */
-    public function failures()
+    public function failures(): array
     {
         return $this->failures;
     }
 
     /**
-     * Returns the names of the tests that have passed.
-     *
-     * @return array
-     * @since  Method available since Release 3.4.0
+     * Gets the number of detected warnings.
      */
-    public function passed()
+    public function warningCount(): int
+    {
+        return count($this->warnings);
+    }
+
+    /**
+     * Returns an array of TestFailure objects for the warnings.
+     *
+     * @return TestFailure[]
+     */
+    public function warnings(): array
+    {
+        return $this->warnings;
+    }
+
+    /**
+     * Returns the names of the tests that have passed.
+     */
+    public function passed(): array
     {
         return $this->passed;
     }
 
     /**
-     * Returns the (top) test suite.
+     * Returns the names of the TestSuites that have passed.
      *
-     * @return PHPUnit_Framework_TestSuite
-     * @since  Method available since Release 3.0.0
+     * This enables @depends-annotations for TestClassName::class
      */
-    public function topTestSuite()
+    public function passedClasses(): array
     {
-        return $this->topTestSuite;
+        return $this->passedTestClasses;
     }
 
     /**
      * Returns whether code coverage information should be collected.
-     *
-     * @return boolean If code coverage should be collected
-     * @since  Method available since Release 3.2.0
      */
-    public function getCollectCodeCoverageInformation()
+    public function getCollectCodeCoverageInformation(): bool
     {
         return $this->codeCoverage !== null;
     }
@@ -566,122 +631,226 @@ class PHPUnit_Framework_TestResult implements Countable
     /**
      * Runs a TestCase.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @throws \SebastianBergmann\CodeCoverage\InvalidArgumentException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     * @throws CodeCoverageException
+     * @throws UnintentionallyCoveredCodeException
      */
-    public function run(PHPUnit_Framework_Test $test)
+    public function run(Test $test): void
     {
-        PHPUnit_Framework_Assert::resetCount();
+        Assert::resetCount();
+
+        $size = TestUtil::UNKNOWN;
+
+        if ($test instanceof TestCase) {
+            $test->setRegisterMockObjectsFromTestArgumentsRecursively(
+                $this->registerMockObjectsFromTestArgumentsRecursively
+            );
+
+            $isAnyCoverageRequired = TestUtil::requiresCodeCoverageDataCollection($test);
+            $size                  = $test->getSize();
+        }
 
         $error      = false;
         $failure    = false;
+        $warning    = false;
         $incomplete = false;
         $risky      = false;
         $skipped    = false;
 
         $this->startTest($test);
 
-        $errorHandlerSet = false;
-
-        if ($this->convertErrorsToExceptions) {
-            $oldErrorHandler = set_error_handler(
-                array('PHPUnit_Util_ErrorHandler', 'handleError'),
-                E_ALL | E_STRICT
+        if ($this->convertDeprecationsToExceptions || $this->convertErrorsToExceptions || $this->convertNoticesToExceptions || $this->convertWarningsToExceptions) {
+            $errorHandler = new ErrorHandler(
+                $this->convertDeprecationsToExceptions,
+                $this->convertErrorsToExceptions,
+                $this->convertNoticesToExceptions,
+                $this->convertWarningsToExceptions
             );
 
-            if ($oldErrorHandler === null) {
-                $errorHandlerSet = true;
-            } else {
-                restore_error_handler();
-            }
+            $errorHandler->register();
         }
 
         $collectCodeCoverage = $this->codeCoverage !== null &&
-                               !$test instanceof PHPUnit_Extensions_SeleniumTestCase &&
-                               !$test instanceof PHPUnit_Framework_Warning;
+                               !$test instanceof ErrorTestCase &&
+                               !$test instanceof WarningTestCase &&
+                               $isAnyCoverageRequired;
 
         if ($collectCodeCoverage) {
-            // We need to blacklist test source files when no whitelist is used.
-            if (!$this->codeCoverage->filter()->hasWhitelist()) {
-                $classes = $this->getHierarchy(get_class($test), true);
-
-                foreach ($classes as $class) {
-                    $this->codeCoverage->filter()->addFileToBlacklist(
-                        $class->getFileName()
-                    );
-                }
-            }
-
             $this->codeCoverage->start($test);
         }
 
-        PHP_Timer::start();
+        $monitorFunctions = $this->beStrictAboutResourceUsageDuringSmallTests &&
+                            !$test instanceof ErrorTestCase &&
+                            !$test instanceof WarningTestCase &&
+                            $size === TestUtil::SMALL &&
+                            function_exists('xdebug_start_function_monitor');
+
+        if ($monitorFunctions) {
+            /* @noinspection ForgottenDebugOutputInspection */
+            xdebug_start_function_monitor(ResourceOperations::getFunctions());
+        }
+
+        $timer = new Timer;
+        $timer->start();
 
         try {
-            if (!$test instanceof PHPUnit_Framework_Warning &&
-                $this->beStrictAboutTestSize &&
-                extension_loaded('pcntl') && class_exists('PHP_Invoker')) {
-                switch ($test->getSize()) {
-                    case PHPUnit_Util_Test::SMALL: {
+            $invoker = new Invoker;
+
+            if (!$test instanceof ErrorTestCase &&
+                !$test instanceof WarningTestCase &&
+                $this->shouldTimeLimitBeEnforced($size) &&
+                $invoker->canInvokeWithTimeout()) {
+                switch ($size) {
+                    case TestUtil::SMALL:
                         $_timeout = $this->timeoutForSmallTests;
-                        }
-                    break;
 
-                    case PHPUnit_Util_Test::MEDIUM: {
+                        break;
+
+                    case TestUtil::MEDIUM:
                         $_timeout = $this->timeoutForMediumTests;
-                        }
-                    break;
 
-                    case PHPUnit_Util_Test::LARGE: {
+                        break;
+
+                    case TestUtil::LARGE:
                         $_timeout = $this->timeoutForLargeTests;
-                        }
-                    break;
+
+                        break;
+
+                    default:
+                        $_timeout = $this->defaultTimeLimit;
                 }
 
-                $invoker = new PHP_Invoker;
-                $invoker->invoke(array($test, 'runBare'), array(), $_timeout);
+                $invoker->invoke([$test, 'runBare'], [], $_timeout);
             } else {
                 $test->runBare();
             }
-        } catch (PHPUnit_Framework_AssertionFailedError $e) {
+        } catch (TimeoutException $e) {
+            $this->addFailure(
+                $test,
+                new RiskyTestError(
+                    $e->getMessage()
+                ),
+                $_timeout
+            );
+
+            $risky = true;
+        } catch (AssertionFailedError $e) {
             $failure = true;
 
-            if ($e instanceof PHPUnit_Framework_RiskyTestError) {
+            if ($e instanceof RiskyTestError) {
                 $risky = true;
-            } elseif ($e instanceof PHPUnit_Framework_IncompleteTestError) {
+            } elseif ($e instanceof IncompleteTestError) {
                 $incomplete = true;
-            } elseif ($e instanceof PHPUnit_Framework_SkippedTestError) {
+            } elseif ($e instanceof SkippedTestError) {
                 $skipped = true;
             }
-        } catch (PHPUnit_Framework_Exception $e) {
-            $error = true;
+        } catch (AssertionError $e) {
+            $test->addToAssertionCount(1);
+
+            $failure = true;
+            $frame   = $e->getTrace()[0];
+
+            $e = new AssertionFailedError(
+                sprintf(
+                    '%s in %s:%s',
+                    $e->getMessage(),
+                    $frame['file'] ?? $e->getFile(),
+                    $frame['line'] ?? $e->getLine()
+                )
+            );
+        } catch (Warning $e) {
+            $warning = true;
         } catch (Exception $e) {
-            $e = new PHPUnit_Framework_ExceptionWrapper($e);
+            $error = true;
+        } catch (Throwable $e) {
+            $e     = new ExceptionWrapper($e);
             $error = true;
         }
 
-        $time = PHP_Timer::stop();
-        $test->addToAssertionCount(PHPUnit_Framework_Assert::getCount());
+        $time = $timer->stop()->asSeconds();
+
+        $test->addToAssertionCount(Assert::getCount());
+
+        if ($monitorFunctions) {
+            $excludeList = new ExcludeList;
+
+            /** @noinspection ForgottenDebugOutputInspection */
+            $functions = xdebug_get_monitored_functions();
+
+            /* @noinspection ForgottenDebugOutputInspection */
+            xdebug_stop_function_monitor();
+
+            foreach ($functions as $function) {
+                if (!$excludeList->isExcluded($function['filename'])) {
+                    $this->addFailure(
+                        $test,
+                        new RiskyTestError(
+                            sprintf(
+                                '%s() used in %s:%s',
+                                $function['function'],
+                                $function['filename'],
+                                $function['lineno']
+                            )
+                        ),
+                        $time
+                    );
+                }
+            }
+        }
 
         if ($this->beStrictAboutTestsThatDoNotTestAnything &&
-            $test->getNumAssertions() == 0) {
+            $test->getNumAssertions() === 0) {
             $risky = true;
+        }
+
+        if ($this->forceCoversAnnotation && !$error && !$failure && !$warning && !$incomplete && !$skipped && !$risky) {
+            $annotations = TestUtil::parseTestMethodAnnotations(
+                get_class($test),
+                $test->getName(false)
+            );
+
+            if (!isset($annotations['class']['covers']) &&
+                !isset($annotations['method']['covers']) &&
+                !isset($annotations['class']['coversNothing']) &&
+                !isset($annotations['method']['coversNothing'])) {
+                $this->addFailure(
+                    $test,
+                    new MissingCoversAnnotationException(
+                        'This test does not have a @covers annotation but is expected to have one'
+                    ),
+                    $time
+                );
+
+                $risky = true;
+            }
         }
 
         if ($collectCodeCoverage) {
             $append           = !$risky && !$incomplete && !$skipped;
-            $linesToBeCovered = array();
-            $linesToBeUsed    = array();
+            $linesToBeCovered = [];
+            $linesToBeUsed    = [];
 
-            if ($append && $test instanceof PHPUnit_Framework_TestCase) {
-                $linesToBeCovered = PHPUnit_Util_Test::getLinesToBeCovered(
-                    get_class($test),
-                    $test->getName(false)
-                );
+            if ($append && $test instanceof TestCase) {
+                try {
+                    $linesToBeCovered = TestUtil::getLinesToBeCovered(
+                        get_class($test),
+                        $test->getName(false)
+                    );
 
-                $linesToBeUsed = PHPUnit_Util_Test::getLinesToBeUsed(
-                    get_class($test),
-                    $test->getName(false)
-                );
+                    $linesToBeUsed = TestUtil::getLinesToBeUsed(
+                        get_class($test),
+                        $test->getName(false)
+                    );
+                } catch (InvalidCoversTargetException $cce) {
+                    $this->addWarning(
+                        $test,
+                        new Warning(
+                            $cce->getMessage()
+                        ),
+                        $time
+                    );
+                }
             }
 
             try {
@@ -690,53 +859,95 @@ class PHPUnit_Framework_TestResult implements Countable
                     $linesToBeCovered,
                     $linesToBeUsed
                 );
-            } catch (PHP_CodeCoverage_Exception_UnintentionallyCoveredCode $cce) {
-                $this->addFailure(
-                    $test,
-                    new PHPUnit_Framework_UnintentionallyCoveredCodeError(
-                        'This test executed code that is not listed as code to be covered or used:' .
-                        PHP_EOL . $cce->getMessage()
-                    ),
-                    $time
+            } catch (UnintentionallyCoveredCodeException $cce) {
+                $unintentionallyCoveredCodeError = new UnintentionallyCoveredCodeError(
+                    'This test executed code that is not listed as code to be covered or used:' .
+                    PHP_EOL . $cce->getMessage()
                 );
-            } catch (PHPUnit_Framework_InvalidCoversTargetException $cce) {
-                $this->addFailure(
-                    $test,
-                    new PHPUnit_Framework_InvalidCoversTargetError(
-                        $cce->getMessage()
-                    ),
-                    $time
-                );
-            } catch (PHP_CodeCoverage_Exception $cce) {
+            } catch (OriginalCodeCoverageException $cce) {
                 $error = true;
 
-                if (!isset($e)) {
-                    $e = $cce;
-                }
+                $e = $e ?? $cce;
             }
         }
 
-        if ($errorHandlerSet === true) {
-            restore_error_handler();
+        if (isset($errorHandler)) {
+            $errorHandler->unregister();
+
+            unset($errorHandler);
         }
 
-        if ($error === true) {
+        if ($error) {
             $this->addError($test, $e, $time);
-        } elseif ($failure === true) {
+        } elseif ($failure) {
             $this->addFailure($test, $e, $time);
-        } elseif ($this->beStrictAboutTestsThatDoNotTestAnything &&
-                 $test->getNumAssertions() == 0) {
+        } elseif ($warning) {
+            $this->addWarning($test, $e, $time);
+        } elseif (isset($unintentionallyCoveredCodeError)) {
             $this->addFailure(
                 $test,
-                new PHPUnit_Framework_RiskyTestError(
-                    'This test did not perform any assertions'
+                $unintentionallyCoveredCodeError,
+                $time
+            );
+        } elseif ($this->beStrictAboutTestsThatDoNotTestAnything &&
+            !$test->doesNotPerformAssertions() &&
+            $test->getNumAssertions() === 0) {
+            try {
+                $reflected = new ReflectionClass($test);
+                // @codeCoverageIgnoreStart
+            } catch (ReflectionException $e) {
+                throw new Exception(
+                    $e->getMessage(),
+                    (int) $e->getCode(),
+                    $e
+                );
+            }
+            // @codeCoverageIgnoreEnd
+
+            $name = $test->getName(false);
+
+            if ($name && $reflected->hasMethod($name)) {
+                try {
+                    $reflected = $reflected->getMethod($name);
+                    // @codeCoverageIgnoreStart
+                } catch (ReflectionException $e) {
+                    throw new Exception(
+                        $e->getMessage(),
+                        (int) $e->getCode(),
+                        $e
+                    );
+                }
+                // @codeCoverageIgnoreEnd
+            }
+
+            $this->addFailure(
+                $test,
+                new RiskyTestError(
+                    sprintf(
+                        "This test did not perform any assertions\n\n%s:%d",
+                        $reflected->getFileName(),
+                        $reflected->getStartLine()
+                    )
+                ),
+                $time
+            );
+        } elseif ($this->beStrictAboutTestsThatDoNotTestAnything &&
+            $test->doesNotPerformAssertions() &&
+            $test->getNumAssertions() > 0) {
+            $this->addFailure(
+                $test,
+                new RiskyTestError(
+                    sprintf(
+                        'This test is annotated with "@doesNotPerformAssertions" but performed %d assertions',
+                        $test->getNumAssertions()
+                    )
                 ),
                 $time
             );
         } elseif ($this->beStrictAboutOutputDuringTests && $test->hasOutput()) {
             $this->addFailure(
                 $test,
-                new PHPUnit_Framework_OutputError(
+                new OutputError(
                     sprintf(
                         'This test printed output: %s',
                         $test->getActualOutput()
@@ -744,13 +955,16 @@ class PHPUnit_Framework_TestResult implements Countable
                 ),
                 $time
             );
-        } elseif ($this->beStrictAboutTodoAnnotatedTests && $test instanceof PHPUnit_Framework_TestCase) {
-            $annotations = $test->getAnnotations();
+        } elseif ($this->beStrictAboutTodoAnnotatedTests && $test instanceof TestCase) {
+            $annotations = TestUtil::parseTestMethodAnnotations(
+                get_class($test),
+                $test->getName(false)
+            );
 
             if (isset($annotations['method']['todo'])) {
                 $this->addFailure(
                     $test,
-                    new PHPUnit_Framework_RiskyTestError(
+                    new RiskyTestError(
                         'Test method is annotated with @todo'
                     ),
                     $time
@@ -763,361 +977,342 @@ class PHPUnit_Framework_TestResult implements Countable
 
     /**
      * Gets the number of run tests.
-     *
-     * @return integer
      */
-    public function count()
+    public function count(): int
     {
         return $this->runTests;
     }
 
     /**
      * Checks whether the test run should stop.
-     *
-     * @return boolean
      */
-    public function shouldStop()
+    public function shouldStop(): bool
     {
         return $this->stop;
     }
 
     /**
      * Marks that the test run should stop.
-     *
      */
-    public function stop()
+    public function stop(): void
     {
         $this->stop = true;
     }
 
     /**
-     * Returns the PHP_CodeCoverage object.
-     *
-     * @return PHP_CodeCoverage
-     * @since  Method available since Release 3.5.0
+     * Returns the code coverage object.
      */
-    public function getCodeCoverage()
+    public function getCodeCoverage(): ?CodeCoverage
     {
         return $this->codeCoverage;
     }
 
     /**
-     * Sets the PHP_CodeCoverage object.
-     *
-     * @param PHP_CodeCoverage $codeCoverage
-     * @since Method available since Release 3.6.0
+     * Sets the code coverage object.
      */
-    public function setCodeCoverage(PHP_CodeCoverage $codeCoverage)
+    public function setCodeCoverage(CodeCoverage $codeCoverage): void
     {
         $this->codeCoverage = $codeCoverage;
     }
 
     /**
-     * Enables or disables the error-to-exception conversion.
-     *
-     * @param  boolean                     $flag
-     * @throws PHPUnit_Framework_Exception
-     * @since  Method available since Release 3.2.14
+     * Enables or disables the deprecation-to-exception conversion.
      */
-    public function convertErrorsToExceptions($flag)
+    public function convertDeprecationsToExceptions(bool $flag): void
     {
-        if (!is_bool($flag)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-        }
+        $this->convertDeprecationsToExceptions = $flag;
+    }
 
+    /**
+     * Returns the deprecation-to-exception conversion setting.
+     */
+    public function getConvertDeprecationsToExceptions(): bool
+    {
+        return $this->convertDeprecationsToExceptions;
+    }
+
+    /**
+     * Enables or disables the error-to-exception conversion.
+     */
+    public function convertErrorsToExceptions(bool $flag): void
+    {
         $this->convertErrorsToExceptions = $flag;
     }
 
     /**
      * Returns the error-to-exception conversion setting.
-     *
-     * @return boolean
-     * @since  Method available since Release 3.4.0
      */
-    public function getConvertErrorsToExceptions()
+    public function getConvertErrorsToExceptions(): bool
     {
         return $this->convertErrorsToExceptions;
     }
 
     /**
-     * Enables or disables the stopping when an error occurs.
-     *
-     * @param  boolean                     $flag
-     * @throws PHPUnit_Framework_Exception
-     * @since  Method available since Release 3.5.0
+     * Enables or disables the notice-to-exception conversion.
      */
-    public function stopOnError($flag)
+    public function convertNoticesToExceptions(bool $flag): void
     {
-        if (!is_bool($flag)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-        }
+        $this->convertNoticesToExceptions = $flag;
+    }
 
+    /**
+     * Returns the notice-to-exception conversion setting.
+     */
+    public function getConvertNoticesToExceptions(): bool
+    {
+        return $this->convertNoticesToExceptions;
+    }
+
+    /**
+     * Enables or disables the warning-to-exception conversion.
+     */
+    public function convertWarningsToExceptions(bool $flag): void
+    {
+        $this->convertWarningsToExceptions = $flag;
+    }
+
+    /**
+     * Returns the warning-to-exception conversion setting.
+     */
+    public function getConvertWarningsToExceptions(): bool
+    {
+        return $this->convertWarningsToExceptions;
+    }
+
+    /**
+     * Enables or disables the stopping when an error occurs.
+     */
+    public function stopOnError(bool $flag): void
+    {
         $this->stopOnError = $flag;
     }
 
     /**
      * Enables or disables the stopping when a failure occurs.
-     *
-     * @param  boolean                     $flag
-     * @throws PHPUnit_Framework_Exception
-     * @since  Method available since Release 3.1.0
      */
-    public function stopOnFailure($flag)
+    public function stopOnFailure(bool $flag): void
     {
-        if (!is_bool($flag)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-        }
-
         $this->stopOnFailure = $flag;
     }
 
     /**
-     * @param  boolean                     $flag
-     * @throws PHPUnit_Framework_Exception
-     * @since  Method available since Release 4.0.0
+     * Enables or disables the stopping when a warning occurs.
      */
-    public function beStrictAboutTestsThatDoNotTestAnything($flag)
+    public function stopOnWarning(bool $flag): void
     {
-        if (!is_bool($flag)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-        }
+        $this->stopOnWarning = $flag;
+    }
 
+    public function beStrictAboutTestsThatDoNotTestAnything(bool $flag): void
+    {
         $this->beStrictAboutTestsThatDoNotTestAnything = $flag;
     }
 
-    /**
-     * @return boolean
-     * @since  Method available since Release 4.0.0
-     */
-    public function isStrictAboutTestsThatDoNotTestAnything()
+    public function isStrictAboutTestsThatDoNotTestAnything(): bool
     {
         return $this->beStrictAboutTestsThatDoNotTestAnything;
     }
 
-    /**
-     * @param  boolean                     $flag
-     * @throws PHPUnit_Framework_Exception
-     * @since  Method available since Release 4.0.0
-     */
-    public function beStrictAboutOutputDuringTests($flag)
+    public function beStrictAboutOutputDuringTests(bool $flag): void
     {
-        if (!is_bool($flag)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-        }
-
         $this->beStrictAboutOutputDuringTests = $flag;
     }
 
-    /**
-     * @return boolean
-     * @since  Method available since Release 4.0.0
-     */
-    public function isStrictAboutOutputDuringTests()
+    public function isStrictAboutOutputDuringTests(): bool
     {
         return $this->beStrictAboutOutputDuringTests;
     }
 
-    /**
-     * @param  boolean                     $flag
-     * @throws PHPUnit_Framework_Exception
-     * @since  Method available since Release 4.0.0
-     */
-    public function beStrictAboutTestSize($flag)
+    public function beStrictAboutResourceUsageDuringSmallTests(bool $flag): void
     {
-        if (!is_bool($flag)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-        }
-
-        $this->beStrictAboutTestSize = $flag;
+        $this->beStrictAboutResourceUsageDuringSmallTests = $flag;
     }
 
-    /**
-     * @return boolean
-     * @since  Method available since Release 4.0.0
-     */
-    public function isStrictAboutTestSize()
+    public function isStrictAboutResourceUsageDuringSmallTests(): bool
     {
-        return $this->beStrictAboutTestSize;
+        return $this->beStrictAboutResourceUsageDuringSmallTests;
     }
 
-    /**
-     * @param  boolean                     $flag
-     * @throws PHPUnit_Framework_Exception
-     * @since  Method available since Release 4.2.0
-     */
-    public function beStrictAboutTodoAnnotatedTests($flag)
+    public function enforceTimeLimit(bool $flag): void
     {
-        if (!is_bool($flag)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-        }
+        $this->enforceTimeLimit = $flag;
+    }
 
+    public function enforcesTimeLimit(): bool
+    {
+        return $this->enforceTimeLimit;
+    }
+
+    public function beStrictAboutTodoAnnotatedTests(bool $flag): void
+    {
         $this->beStrictAboutTodoAnnotatedTests = $flag;
     }
 
-    /**
-     * @return boolean
-     * @since  Method available since Release 4.2.0
-     */
-    public function isStrictAboutTodoAnnotatedTests()
+    public function isStrictAboutTodoAnnotatedTests(): bool
     {
         return $this->beStrictAboutTodoAnnotatedTests;
     }
 
+    public function forceCoversAnnotation(): void
+    {
+        $this->forceCoversAnnotation = true;
+    }
+
+    public function forcesCoversAnnotation(): bool
+    {
+        return $this->forceCoversAnnotation;
+    }
+
     /**
      * Enables or disables the stopping for risky tests.
-     *
-     * @param  boolean                     $flag
-     * @throws PHPUnit_Framework_Exception
-     * @since  Method available since Release 4.0.0
      */
-    public function stopOnRisky($flag)
+    public function stopOnRisky(bool $flag): void
     {
-        if (!is_bool($flag)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-        }
-
         $this->stopOnRisky = $flag;
     }
 
     /**
      * Enables or disables the stopping for incomplete tests.
-     *
-     * @param  boolean                     $flag
-     * @throws PHPUnit_Framework_Exception
-     * @since  Method available since Release 3.5.0
      */
-    public function stopOnIncomplete($flag)
+    public function stopOnIncomplete(bool $flag): void
     {
-        if (!is_bool($flag)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-        }
-
         $this->stopOnIncomplete = $flag;
     }
 
     /**
      * Enables or disables the stopping for skipped tests.
-     *
-     * @param  boolean                     $flag
-     * @throws PHPUnit_Framework_Exception
-     * @since  Method available since Release 3.1.0
      */
-    public function stopOnSkipped($flag)
+    public function stopOnSkipped(bool $flag): void
     {
-        if (!is_bool($flag)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-        }
-
         $this->stopOnSkipped = $flag;
     }
 
     /**
-     * Returns the time spent running the tests.
-     *
-     * @return float
+     * Enables or disables the stopping for defects: error, failure, warning.
      */
-    public function time()
+    public function stopOnDefect(bool $flag): void
+    {
+        $this->stopOnDefect = $flag;
+    }
+
+    /**
+     * Returns the time spent running the tests.
+     */
+    public function time(): float
     {
         return $this->time;
     }
 
     /**
      * Returns whether the entire test was successful or not.
-     *
-     * @return boolean
      */
-    public function wasSuccessful()
+    public function wasSuccessful(): bool
+    {
+        return $this->wasSuccessfulIgnoringWarnings() && empty($this->warnings);
+    }
+
+    public function wasSuccessfulIgnoringWarnings(): bool
     {
         return empty($this->errors) && empty($this->failures);
     }
 
+    public function wasSuccessfulAndNoTestIsRiskyOrSkippedOrIncomplete(): bool
+    {
+        return $this->wasSuccessful() && $this->allHarmless() && $this->allCompletelyImplemented() && $this->noneSkipped();
+    }
+
+    /**
+     * Sets the default timeout for tests.
+     */
+    public function setDefaultTimeLimit(int $timeout): void
+    {
+        $this->defaultTimeLimit = $timeout;
+    }
+
     /**
      * Sets the timeout for small tests.
-     *
-     * @param  integer                     $timeout
-     * @throws PHPUnit_Framework_Exception
-     * @since  Method available since Release 3.6.0
      */
-    public function setTimeoutForSmallTests($timeout)
+    public function setTimeoutForSmallTests(int $timeout): void
     {
-        if (!is_integer($timeout)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'integer');
-        }
-
         $this->timeoutForSmallTests = $timeout;
     }
 
     /**
      * Sets the timeout for medium tests.
-     *
-     * @param  integer                     $timeout
-     * @throws PHPUnit_Framework_Exception
-     * @since  Method available since Release 3.6.0
      */
-    public function setTimeoutForMediumTests($timeout)
+    public function setTimeoutForMediumTests(int $timeout): void
     {
-        if (!is_integer($timeout)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'integer');
-        }
-
         $this->timeoutForMediumTests = $timeout;
     }
 
     /**
      * Sets the timeout for large tests.
-     *
-     * @param  integer                     $timeout
-     * @throws PHPUnit_Framework_Exception
-     * @since  Method available since Release 3.6.0
      */
-    public function setTimeoutForLargeTests($timeout)
+    public function setTimeoutForLargeTests(int $timeout): void
     {
-        if (!is_integer($timeout)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'integer');
-        }
-
         $this->timeoutForLargeTests = $timeout;
     }
 
     /**
-     * Returns the class hierarchy for a given class.
-     *
-     * @param  string  $className
-     * @param  boolean $asReflectionObjects
-     * @return array
+     * Returns the set timeout for large tests.
      */
-    protected function getHierarchy($className, $asReflectionObjects = false)
+    public function getTimeoutForLargeTests(): int
     {
-        if ($asReflectionObjects) {
-            $classes = array(new ReflectionClass($className));
-        } else {
-            $classes = array($className);
+        return $this->timeoutForLargeTests;
+    }
+
+    public function setRegisterMockObjectsFromTestArgumentsRecursively(bool $flag): void
+    {
+        $this->registerMockObjectsFromTestArgumentsRecursively = $flag;
+    }
+
+    private function recordError(Test $test, Throwable $t): void
+    {
+        $this->errors[] = new TestFailure($test, $t);
+    }
+
+    private function recordNotImplemented(Test $test, Throwable $t): void
+    {
+        $this->notImplemented[] = new TestFailure($test, $t);
+    }
+
+    private function recordRisky(Test $test, Throwable $t): void
+    {
+        $this->risky[] = new TestFailure($test, $t);
+    }
+
+    private function recordSkipped(Test $test, Throwable $t): void
+    {
+        $this->skipped[] = new TestFailure($test, $t);
+    }
+
+    private function recordWarning(Test $test, Throwable $t): void
+    {
+        $this->warnings[] = new TestFailure($test, $t);
+    }
+
+    private function shouldTimeLimitBeEnforced(int $size): bool
+    {
+        if (!$this->enforceTimeLimit) {
+            return false;
         }
 
-        $done = false;
-
-        while (!$done) {
-            if ($asReflectionObjects) {
-                $class = new ReflectionClass(
-                    $classes[count($classes)-1]->getName()
-                );
-            } else {
-                $class = new ReflectionClass($classes[count($classes)-1]);
-            }
-
-            $parent = $class->getParentClass();
-
-            if ($parent !== false) {
-                if ($asReflectionObjects) {
-                    $classes[] = $parent;
-                } else {
-                    $classes[] = $parent->getName();
-                }
-            } else {
-                $done = true;
-            }
+        if (!(($this->defaultTimeLimit || $size !== TestUtil::UNKNOWN))) {
+            return false;
         }
 
-        return $classes;
+        if (!extension_loaded('pcntl')) {
+            return false;
+        }
+
+        if (!class_exists(Invoker::class)) {
+            return false;
+        }
+
+        if (extension_loaded('xdebug') && xdebug_is_debugger_active()) {
+            return false;
+        }
+
+        return true;
     }
 }
