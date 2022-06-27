@@ -1,5 +1,5 @@
 {
-    "name": "nypl/bibliophpile",
+    "name": "greg-boggs/bibliophpile",
     "autoload": {
         "psr-0": {"NYPL": "src/"}
     },
