@@ -1,5 +1,13 @@
 {
     "name": "greg-boggs/bibliophpile",
+     "license": "Apache-2.0",
+     "authors": [
+       {
+        "name": "Greg Boggs",
+        "homepage": "https://www.drupal.org/u/greg-boggs",
+        "role": "Maintainer"
+      }
+    ],
     "autoload": {
         "psr-0": {"NYPL": "src/"}
     },
