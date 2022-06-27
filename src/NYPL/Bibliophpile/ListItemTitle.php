@@ -2,7 +2,7 @@
 
 /**
  * @file
- * ListItemTitle class 
+ * ListItemTitle class
  */
 
 namespace NYPL\Bibliophpile;
@@ -15,4 +15,5 @@ class ListItemTitle extends ListItem {
   protected function initItem($client) {
     $this->item = new Title($this->data->title, $client);
   }
+
 }

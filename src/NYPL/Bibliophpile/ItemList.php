@@ -2,7 +2,7 @@
 
 /**
  * @file
- * List class 
+ * List class
  */
 
 namespace NYPL\Bibliophpile;
@@ -15,7 +15,7 @@ class ItemList extends ClientResource {
   /**
    * List object constructor.
    *
-   * @param StdObj $data 
+   * @param StdObj $data
    *   Parsed JSON for the object.
    * @param Client $client
    *   Client for future connections
