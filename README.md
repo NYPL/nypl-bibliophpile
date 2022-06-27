@@ -41,8 +41,6 @@ If your are using PHP 5.4 or greater, you can use the built-in web server to run
 
 Then go to browser and open `http://localhost:8000/demo.php
 
-# Using nypl-bibliophpile
-
 ## Basic Usage
 
 Create a client:
