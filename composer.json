@@ -1,16 +1,18 @@
 {
-    "name": "nypl/bibliophpile",
+    "name": "greg-boggs/bibliophpile",
+     "license": "Apache-2.0",
+     "authors": [
+       {
+        "name": "Greg Boggs",
+        "homepage": "https://www.drupal.org/u/greg-boggs",
+        "role": "Maintainer"
+      }
+    ],
     "autoload": {
         "psr-0": {"NYPL": "src/"}
     },
-    "repositories": [
-        {
-            "type": "pear",
-            "url": "http://pear.php.net"
-        }
-    ],
     "require": {
-        "pear-pear/HTTP_Request2": "~2.1.1"
+        "pear/http_request2": "~2"
     },
     "require-dev": {
         "phpunit/phpunit": "*"

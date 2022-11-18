@@ -1,156 +1,123 @@
-<?php
-/**
- * PHPUnit
+<?php declare(strict_types=1);
+/*
+ * This file is part of PHPUnit.
  *
- * Copyright (c) 2001-2014, Sebastian Bergmann <sebastian@phpunit.de>.
- * All rights reserved.
+ * (c) Sebastian Bergmann <sebastian@phpunit.de>
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
- *
- *   * Neither the name of Sebastian Bergmann nor the names of his
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * @package    PHPUnit
- * @subpackage Runner
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  2001-2014 Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @link       http://www.phpunit.de/
- * @since      File available since Release 2.0.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+namespace PHPUnit\Runner;
+
+use function array_diff;
+use function array_values;
+use function basename;
+use function class_exists;
+use function get_declared_classes;
+use function sprintf;
+use function stripos;
+use function strlen;
+use function substr;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Util\FileLoader;
+use ReflectionClass;
+use ReflectionException;
 
 /**
- * The standard test suite loader.
+ * @internal This class is not covered by the backward compatibility promise for PHPUnit
  *
- * @package    PHPUnit
- * @subpackage Runner
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  2001-2014 Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @link       http://www.phpunit.de/
- * @since      Class available since Release 2.0.0
+ * @deprecated see https://github.com/sebastianbergmann/phpunit/issues/4039
  */
-class PHPUnit_Runner_StandardTestSuiteLoader implements PHPUnit_Runner_TestSuiteLoader
+final class StandardTestSuiteLoader implements TestSuiteLoader
 {
     /**
-     * @param  string                      $suiteClassName
-     * @param  string                      $suiteClassFile
-     * @return ReflectionClass
-     * @throws PHPUnit_Framework_Exception
+     * @throws Exception
      */
-    public function load($suiteClassName, $suiteClassFile = '')
+    public function load(string $suiteClassFile): ReflectionClass
     {
-        $suiteClassName = str_replace('.php', '', $suiteClassName);
-
-        if (empty($suiteClassFile)) {
-            $suiteClassFile = PHPUnit_Util_Filesystem::classNameToFilename(
-                $suiteClassName
-            );
-        }
+        $suiteClassName = basename($suiteClassFile, '.php');
+        $loadedClasses  = get_declared_classes();
 
         if (!class_exists($suiteClassName, false)) {
-            $loadedClasses = get_declared_classes();
-
-            $filename = PHPUnit_Util_Fileloader::checkAndLoad($suiteClassFile);
+            /* @noinspection UnusedFunctionResultInspection */
+            FileLoader::checkAndLoad($suiteClassFile);
 
             $loadedClasses = array_values(
                 array_diff(get_declared_classes(), $loadedClasses)
             );
+
+            if (empty($loadedClasses)) {
+                throw $this->exceptionFor($suiteClassName, $suiteClassFile);
+            }
         }
 
-        if (!class_exists($suiteClassName, false) && !empty($loadedClasses)) {
+        if (!class_exists($suiteClassName, false)) {
+            // this block will handle namespaced classes
             $offset = 0 - strlen($suiteClassName);
 
             foreach ($loadedClasses as $loadedClass) {
-                $class = new ReflectionClass($loadedClass);
-                if (substr($loadedClass, $offset) === $suiteClassName &&
-                    $class->getFileName() == $filename) {
+                if (stripos(substr($loadedClass, $offset - 1), '\\' . $suiteClassName) === 0) {
                     $suiteClassName = $loadedClass;
+
                     break;
                 }
             }
         }
 
-        if (!class_exists($suiteClassName, false) && !empty($loadedClasses)) {
-            $testCaseClass = 'PHPUnit_Framework_TestCase';
-
-            foreach ($loadedClasses as $loadedClass) {
-                $class     = new ReflectionClass($loadedClass);
-                $classFile = $class->getFileName();
-
-                if ($class->isSubclassOf($testCaseClass) &&
-                    !$class->isAbstract()) {
-                    $suiteClassName = $loadedClass;
-                    $testCaseClass  = $loadedClass;
-
-                    if ($classFile == realpath($suiteClassFile)) {
-                        break;
-                    }
-                }
-
-                if ($class->hasMethod('suite')) {
-                    $method = $class->getMethod('suite');
-
-                    if (!$method->isAbstract() &&
-                        $method->isPublic() &&
-                        $method->isStatic()) {
-                        $suiteClassName = $loadedClass;
-
-                        if ($classFile == realpath($suiteClassFile)) {
-                            break;
-                        }
-                    }
-                }
-            }
+        if (!class_exists($suiteClassName, false)) {
+            throw $this->exceptionFor($suiteClassName, $suiteClassFile);
         }
 
-        if (class_exists($suiteClassName, false)) {
+        try {
             $class = new ReflectionClass($suiteClassName);
+            // @codeCoverageIgnoreStart
+        } catch (ReflectionException $e) {
+            throw new Exception(
+                $e->getMessage(),
+                (int) $e->getCode(),
+                $e
+            );
+        }
+        // @codeCoverageIgnoreEnd
 
-            if ($class->getFileName() == realpath($suiteClassFile)) {
+        if ($class->isSubclassOf(TestCase::class) && !$class->isAbstract()) {
+            return $class;
+        }
+
+        if ($class->hasMethod('suite')) {
+            try {
+                $method = $class->getMethod('suite');
+                // @codeCoverageIgnoreStart
+            } catch (ReflectionException $e) {
+                throw new Exception(
+                    $e->getMessage(),
+                    (int) $e->getCode(),
+                    $e
+                );
+            }
+            // @codeCoverageIgnoreEnd
+
+            if (!$method->isAbstract() && $method->isPublic() && $method->isStatic()) {
                 return $class;
             }
         }
 
-        throw new PHPUnit_Framework_Exception(
-            sprintf(
-                "Class '%s' could not be found in '%s'.",
-                $suiteClassName,
-                $suiteClassFile
-            )
-        );
+        throw $this->exceptionFor($suiteClassName, $suiteClassFile);
     }
 
-    /**
-     * @param  ReflectionClass $aClass
-     * @return ReflectionClass
-     */
-    public function reload(ReflectionClass $aClass)
+    public function reload(ReflectionClass $aClass): ReflectionClass
     {
         return $aClass;
+    }
+
+    private function exceptionFor(string $className, string $filename): Exception
+    {
+        return new Exception(
+            sprintf(
+                "Class '%s' could not be found in '%s'.",
+                $className,
+                $filename
+            )
+        );
     }
 }

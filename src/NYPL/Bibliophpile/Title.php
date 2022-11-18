@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Library class 
+ * Library class
  */
 
 namespace NYPL\Bibliophpile;
@@ -16,14 +16,16 @@ class Title extends ClientResource {
   /**
    * Title object constructor.
    *
-   * @param StdObj $data 
+   * @param StdObj $data
    *   Parsed JSON for the object.
    * @param Client $client
    *   Client for future connections
    */
   public function __construct($data, $client) {
     parent::__construct($data, $client);
-    $this->data->format = new Format($this->data->format);
+    if (isset($this->data->format)) {
+      $this->data->format = new Format($this->data->format);
+    }
     $this->initOptionalProperties();
     $this->initSingleProperties();
     $this->initSeries();
@@ -36,6 +38,7 @@ class Title extends ClientResource {
   protected function initOptionalProperties() {
     $this->initOptionalProperty('sub_title', 'string');
     $this->initOptionalProperty('availability', 'object');
+    $this->initOptionalProperty('jacket_cover', 'object');
     $this->initOptionalProperty('authors', 'array', array());
     $this->initOptionalProperty('isbns', 'array', array());
     $this->initOptionalProperty('upcs', 'array', array());
@@ -130,6 +133,16 @@ class Title extends ClientResource {
    */
   public function format() {
     return $this->data->format;
+  }
+
+  /**
+   * Returns the title's jacket.
+   *
+   * @return string
+   *   The book jacket image URL
+   */
+  public function jacket_cover() {
+    return $this->data->jacket_cover;
   }
 
   /**
@@ -338,7 +351,7 @@ class Title extends ClientResource {
   /**
    * Returns the title's copies.
    *
-   * Each title may have multiple copies in different locations. The copies 
+   * Each title may have multiple copies in different locations. The copies
    * themseleves have finer-grained availability information.
    *
    * @return array

@@ -1,10 +1,2 @@
-build/api
-build/code-browser
-build/coverage
-build/logs
-build/pdepend
-build/phpdox
-build/SebastianBergmann
-build/*.tgz
-cache.properties
+/.php_cs.cache
 /.idea

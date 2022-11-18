@@ -1,56 +1,104 @@
-# PHP_Timer
+# phpunit/php-timer
+
+[![CI Status](https://github.com/sebastianbergmann/php-timer/workflows/CI/badge.svg)](https://github.com/sebastianbergmann/php-timer/actions)
+[![Type Coverage](https://shepherd.dev/github/sebastianbergmann/php-timer/coverage.svg)](https://shepherd.dev/github/sebastianbergmann/php-timer)
 
 Utility class for timing things, factored out of PHPUnit into a stand-alone component.
 
 ## Installation
 
-You can use the [PEAR Installer](http://pear.php.net/manual/en/guide.users.commandline.cli.php) or [Composer](http://getcomposer.org/) to download and install this package as well as its dependencies.
+You can add this library as a local, per-project dependency to your project using [Composer](https://getcomposer.org/):
 
-### PEAR Installer
+```
+composer require phpunit/php-timer
+```
 
-The following two commands (which you may have to run as `root`) are all that is required to install this package using the PEAR Installer:
+If you only need this library during development, for instance to run your project's test suite, then you should add it as a development-time dependency:
 
-    pear config-set auto_discover 1
-    pear install pear.phpunit.de/PHP_Timer
+```
+composer require --dev phpunit/php-timer
+```
 
-### Composer
+## Usage
 
-To add this package as a local, per-project dependency to your project, simply add a dependency on `phpunit/php-timer` to your project's `composer.json` file. Here is a minimal example of a `composer.json` file that just defines a dependency on PHP_Timer:
-
-    {
-        "require": {
-            "phpunit/php-timer": "*"
-        }
-    }
-
-### Usage
-
-#### Basic Timing
+### Basic Timing
 
 ```php
-PHP_Timer::start();
+require __DIR__ . '/vendor/autoload.php';
+
+use SebastianBergmann\Timer\Timer;
+
+$timer = new Timer;
 
 $timer->start();
 
-// ...
+foreach (\range(0, 100000) as $i) {
+    // ...
+}
 
-$time = PHP_Timer::stop();
-var_dump($time);
+$duration = $timer->stop();
 
-print PHP_Timer::secondsToTimeString($time);
+var_dump(get_class($duration));
+var_dump($duration->asString());
+var_dump($duration->asSeconds());
+var_dump($duration->asMilliseconds());
+var_dump($duration->asMicroseconds());
+var_dump($duration->asNanoseconds());
 ```
 
 The code above yields the output below:
 
-    double(1.0967254638672E-5)
-    0 ms
+```
+string(32) "SebastianBergmann\Timer\Duration"
+string(9) "00:00.002"
+float(0.002851062)
+float(2.851062)
+float(2851.062)
+int(2851062)
+```
 
-#### Resource Consumption Since PHP Startup
+### Resource Consumption
+
+#### Explicit duration
 
 ```php
-print PHP_Timer::resourceUsage();
+require __DIR__ . '/vendor/autoload.php';
+
+use SebastianBergmann\Timer\ResourceUsageFormatter;
+use SebastianBergmann\Timer\Timer;
+
+$timer = new Timer;
+$timer->start();
+
+foreach (\range(0, 100000) as $i) {
+    // ...
+}
+
+print (new ResourceUsageFormatter)->resourceUsage($timer->stop());
 ```
 
 The code above yields the output below:
 
-    Time: 0 ms, Memory: 0.50Mb
+```
+Time: 00:00.002, Memory: 6.00 MB
+```
+
+#### Duration since PHP Startup (using unreliable `$_SERVER['REQUEST_TIME_FLOAT']`)
+
+```php
+require __DIR__ . '/vendor/autoload.php';
+
+use SebastianBergmann\Timer\ResourceUsageFormatter;
+
+foreach (\range(0, 100000) as $i) {
+    // ...
+}
+
+print (new ResourceUsageFormatter)->resourceUsageSinceStartOfRequest();
+```
+
+The code above yields the output below:
+
+```
+Time: 00:00.002, Memory: 6.00 MB
+```
