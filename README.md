@@ -2,6 +2,11 @@
 
 PHP Wrapper for [BiblioCommons](http://www.bibliocommons.com/) API
 
+## Credit
+
+Originally written by The New York Public Library: https://www.nypl.org/
+Currently maintained by Multnomah County Library: https://multcolib.org/
+
 ## Installation
 
 Clone the repository, `cd` onto your cloned directory and run composer:
